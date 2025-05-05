@@ -4,7 +4,12 @@ document.addEventListener('alpine:init', () => {
         return {
             currentIndex: 0,
             images: [],
+            isDrawing: false,
             
+            startDraw() {
+                this.isDrawing = true;
+            },
+
             init() {
                 // Initialize with raffleImages or empty array
                 this.images = window.raffleImages || [];
@@ -32,15 +37,20 @@ document.addEventListener('alpine:init', () => {
             },
 
             get slides() {
+                if (this.isDrawing) {
+                    return [{
+                        ...this.currentSlide,
+                        position: 0
+                    }];
+                }
+            
                 const result = [];
                 const total = this.images.length;
                 
-                // Safety check to prevent errors with empty arrays
                 if (total === 0) return [];
 
                 for (let i = 0; i < total; i++) {
                     const relativePos = (i - this.currentIndex + total) % total;
-                    // Simplify position calculation
                     const normalizedPos = relativePos > Math.floor(total / 2) ? relativePos - total : relativePos;
                     
                     result.push({
@@ -64,10 +74,8 @@ document.addEventListener('alpine:init', () => {
                     '-2': { scale: 0.3, offsetX: -560, offsetY: 230, zIndex: 80, opacity: 0.9 }
                 };
 
-                // Convert position to string for object lookup
                 const posKey = position.toString();
                 
-                // Default fallback values
                 const fallback = {
                     scale: 0.3,
                     offsetX: position * 330,

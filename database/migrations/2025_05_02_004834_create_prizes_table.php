@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id('prize_id');
             $table->string('prize_name');
             $table->decimal('prize_value', 10, 2);
+            $table->string('prize_image')->nullable();
             $table->unsignedBigInteger('raffle_id');
             $table->timestamps();
             $table->foreign('raffle_id')->references('raffle_id')->on('raffles')->onDelete('cascade');
@@ -26,6 +27,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('prizes');
+        Schema::table('prizes', function (Blueprint $table) {
+            $table->dropColumn('prize_image');
+        });
     }
 };

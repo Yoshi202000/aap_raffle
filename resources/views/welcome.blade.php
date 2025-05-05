@@ -18,7 +18,13 @@
                     <img :src="slide.src" :alt="slide.caption">
                 </div>
             </template>
-            
+            <div 
+            x-show="isDrawing"
+            x-transition
+            class="winner-box"
+        >
+             Congratulations! <span x-text="currentSlide.caption"></span> 
+        </div>
             <div class="navigation">
                 <div @click="prev()" class="nav-button-left"></div>
                 <div @click="next()" class="nav-button-right"></div>
@@ -27,8 +33,9 @@
         
         <div class="product-name" x-text="currentSlide.caption"></div>
         
-        <button class="cta-button">START DRAW</button>
-    </div>
+        <button class="cta-button" @click="startDraw()">START DRAW</button>
+        </div>
+        
 
     <script>
     window.raffleImages = [

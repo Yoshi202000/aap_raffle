@@ -150,3 +150,18 @@ body {
     right: -10%;
     transform: skew(-10deg);
 }
+
+.winner-box {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px 50px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    z-index: 200;
+}
