@@ -3,11 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RaffleController;
 use App\Http\Controllers\PrizeController;
+use App\Http\Controllers\AapRaffleController;
 
-
-Route::get('/', function () {
-    return redirect('/raffles');
-});
 
 Route::get('/raffles/index', function (){
     return view('index');
@@ -34,3 +31,13 @@ Route::resource('prizes', PrizeController::class)->except(['index', 'create', 's
 Route::post('/prizes', [PrizeController::class, 'store']);
 Route::get('/raffles/{raffle_id}/prizes', [PrizeController::class, 'showByRaffle'])->name('prizes.show');
 Route::post('/prizes-debug', [PrizeController::class, 'debug'])->name('prizes.debug');
+
+//aap_raffle
+Route::get('/aap_raffles/edit', [AapRaffleController::class, 'customEdit'])->name('aap_raffles.custom_edit');
+
+Route::resource('aap_raffles', AapRaffleController::class);
+Route::post('/aap_raffles/update-order', [AapRaffleController::class, 'updateOrder'])->name('aap_raffles.updateOrder');
+
+// Routes for inline editing
+Route::post('/aap_raffles/update-field/{id}', [AapRaffleController::class, 'updateField'])->name('aap_raffles.updateField');
+Route::post('/aap_raffles/update-image/{id}', [AapRaffleController::class, 'updateImage'])->name('aap_raffles.updateImage');
