@@ -6,9 +6,8 @@
     <div class="row justify-content-center">
         <div class="col-md-12">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="custom-card-header">
                     <h2>AAP Raffles</h2>
-                    <a href="{{ route('aap_raffles.create') }}" class="btn btn-primary">Add New Raffle</a>
                 </div>
 
                 <div class="card-body">
@@ -32,9 +31,7 @@
                                                 <tr>
                                                     <th width="5%">Order</th>
                                                     <th width="35%">Prize Name</th>
-                                                    <th width="15%"># Attendees</th>
                                                     <th width="20%">Image</th>
-                                                    <th width="15%">Date</th>
                                                     <th width="10%">Actions</th>
                                                 </tr>
                                             </thead>
@@ -51,17 +48,6 @@
                                                             <td>
                                                                 <div class="editable-field prize-name" data-field="ar_nameprize" data-id="{{ $raffle->ar_id }}">
                                                                     <span class="editable-text">{{ $raffle->ar_nameprize }}</span>
-                                                                    <button class="btn btn-sm btn-outline-secondary edit-btn">
-                                                                        <i class="fas fa-pencil-alt"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="editable-field attendees" data-field="ar_noattendees" data-id="{{ $raffle->ar_id }}">
-                                                                    <span class="editable-text">{{ $raffle->ar_noattendees }}</span>
-                                                                    <button class="btn btn-sm btn-outline-secondary edit-btn">
-                                                                        <i class="fas fa-pencil-alt"></i>
-                                                                    </button>
                                                                 </div>
                                                             </td>
                                                             <td>
@@ -78,20 +64,18 @@
                                                                     @endif
                                                                 </div>
                                                             </td>
-                                                            <td>{{ \Carbon\Carbon::parse($raffle->ar_date)->format('M d, Y') }}</td>
                                                             <td>
                                                                 <div class="btn-group" role="group">
-                                                                    <a href="{{ route('aap_raffles.show', $raffle->ar_id) }}" class="btn btn-info btn-sm">
-                                                                        <i class="fas fa-eye"></i>
-                                                                    </a>
-                                                                    <a href="{{ route('aap_raffles.edit', $raffle->ar_id) }}" class="btn btn-primary btn-sm">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </a>
+                                                                    <form action="">
+                                                                    <button type="button" class="Edit-button btn btn-primary btn-sm" data-id="{{ $raffle->ar_id }}">
+    <i class="fas fa-edit"></i> Edit
+</button>
+                                                                    </form>
                                                                     <form action="{{ route('aap_raffles.destroy', $raffle->ar_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this raffle?');" style="display: inline-block;">
                                                                         @csrf
                                                                         @method('DELETE')
-                                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                                            <i class="fas fa-trash"></i>
+                                                                        <button type="submit" class="delete-button">
+                                                                            Delete
                                                                         </button>
                                                                     </form>
                                                                 </div>
@@ -109,10 +93,14 @@
                                         </table>
                                         
                                         @if($memberRafflesFound)
-                                            <button type="button" class="btn btn-success save-order-btn" data-type="members">
+                                            <button type="button" class="btn btn-success save-order-btn" data-type="members" onclick="saveOrder('members')">
                                                 <i class="fas fa-save"></i> Save Members Order
                                             </button>
                                         @endif
+                                        @include('aap_raffle.members_modal')
+                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#attendeesRaffleModal" onclick="setNextOrderNumber('members-tbody')">
+                                        Create Members Raffle
+                                    </button>
                                     </div>
                                 </div>
                             </div>
@@ -131,9 +119,7 @@
                                                 <tr>
                                                     <th width="5%">Order</th>
                                                     <th width="35%">Prize Name</th>
-                                                    <th width="15%"># Attendees</th>
                                                     <th width="20%">Image</th>
-                                                    <th width="15%">Date</th>
                                                     <th width="10%">Actions</th>
                                                 </tr>
                                             </thead>
@@ -150,19 +136,9 @@
                                                             <td>
                                                                 <div class="editable-field prize-name" data-field="ar_nameprize" data-id="{{ $raffle->ar_id }}">
                                                                     <span class="editable-text">{{ $raffle->ar_nameprize }}</span>
-                                                                    <button class="btn btn-sm btn-outline-secondary edit-btn">
-                                                                        <i class="fas fa-pencil-alt"></i>
-                                                                    </button>
                                                                 </div>
                                                             </td>
-                                                            <td>
-                                                                <div class="editable-field attendees" data-field="ar_noattendees" data-id="{{ $raffle->ar_id }}">
-                                                                    <span class="editable-text">{{ $raffle->ar_noattendees }}</span>
-                                                                    <button class="btn btn-sm btn-outline-secondary edit-btn">
-                                                                        <i class="fas fa-pencil-alt"></i>
-                                                                    </button>
-                                                                </div>
-                                                            </td>
+                                                            
                                                             <td>
                                                                 <div class="image-upload-container">
                                                                     @if($raffle->raffle_image)
@@ -177,20 +153,17 @@
                                                                     @endif
                                                                 </div>
                                                             </td>
-                                                            <td>{{ \Carbon\Carbon::parse($raffle->ar_date)->format('M d, Y') }}</td>
                                                             <td>
                                                                 <div class="btn-group" role="group">
-                                                                    <a href="{{ route('aap_raffles.show', $raffle->ar_id) }}" class="btn btn-info btn-sm">
-                                                                        <i class="fas fa-eye"></i>
-                                                                    </a>
-                                                                    <a href="{{ route('aap_raffles.edit', $raffle->ar_id) }}" class="btn btn-primary btn-sm">
-                                                                        <i class="fas fa-edit"></i>
-                                                                    </a>
+                                                                    <form action="" class="display: inline-block;">
+                                                                    <button type="button" class="Edit-button btn btn-primary btn-sm" data-id="{{ $raffle->ar_id }}">
+    <i class="fas fa-edit"></i> Edit
+</button></form>
                                                                     <form action="{{ route('aap_raffles.destroy', $raffle->ar_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this raffle?');" style="display: inline-block;">
                                                                         @csrf
                                                                         @method('DELETE')
-                                                                        <button type="submit" class="btn btn-danger btn-sm">
-                                                                            <i class="fas fa-trash"></i>
+                                                                        <button type="submit" class="delete-button">
+                                                                            Delete
                                                                         </button>
                                                                     </form>
                                                                 </div>
@@ -212,6 +185,10 @@
                                                 <i class="fas fa-save"></i> Save Attendees Order
                                             </button>
                                         @endif
+                                        @include('aap_raffle.attendees_modal')
+                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#attendeesRaffleModal" onclick="setNextOrderNumber('attendees-tbody')">
+                                            Add Attendees Raffle
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -256,6 +233,7 @@
         </div>
     </div>
 </div>
+@include('aap_raffle.edit_modal')
 
 <!-- CSRF Token Meta -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -290,9 +268,60 @@
     .image-upload-container:hover .change-image-btn {
         visibility: visible;
     }
+    .delete-button{
+        background-color: red;
+        border-radius: 5px;
+        border: none;
+        color: white;
+        padding: 5px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 3px;
+    }
+    .edit-button{
+        background-color: green;
+        border-radius: 5px;
+        border: none;
+        color: white;
+        padding: 5px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 3px;
+    }
+    .custom-card-header{
+        display: flex;                    
+    justify-content: space-between;   
+    align-items: center;              
+    padding: 0.75rem 1.25rem;       
+    background-color: #f8f9fa;        
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125); 
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    }
+    .container{
+        width: 100%;
+    }
 </style>
 
 <script>
+// Function to get next order number for a specific table
+function getNextOrderNumber(tableId) {
+    const rows = document.querySelectorAll(`#${tableId} tr:not(.no-sort)`);
+    if (rows.length === 0) {
+        return 1;
+    }
+    let maxOrder = 0;
+    rows.forEach(row => {
+        const orderValue = parseInt(row.getAttribute('data-order')) || 0;
+        maxOrder = Math.max(maxOrder, orderValue);
+    });
+    return maxOrder + 1;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // CSRF token setup for AJAX
     $.ajaxSetup({
@@ -374,67 +403,58 @@ function setupSaveOrderButtons() {
 }
 
 // Save order function
-function saveOrder(tableId) {
-    const rows = document.querySelectorAll(`#${tableId} tr:not(.no-sort)`);
-    const orderData = [];
+function saveOrder(type) {
+    let orders = [];
     
-    rows.forEach(row => {
-        orderData.push({
-            id: row.getAttribute('data-id'),
-            order: row.getAttribute('data-order')
-        });
+    // Collect the order information from the table
+    $(`#${type}-tbody tr:not(.no-sort)`).each(function(index) {
+        const id = $(this).data('id');
+        if (id) {
+            orders.push({
+                id: id,
+                order: index + 1
+            });
+        }
     });
     
-    // Show loading state
-    const saveBtn = document.querySelector(`button[data-type="${tableId === 'members-tbody' ? 'members' : 'attendees'}"]`);
-    const originalText = saveBtn.innerHTML;
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    saveBtn.disabled = true;
-    
-    // Send AJAX request
+    // Send the order data to the server
     $.ajax({
-        url: '{{ route("aap_raffles.updateOrder") }}',
-        method: 'POST',
+        url: '/aap_raffles/update-order', // Using direct URL instead of route()
+        type: 'POST',
         data: {
-            orders: orderData
+            _token: '{{ csrf_token() }}',
+            orders: orders
         },
         success: function(response) {
-            // Show success message
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-success mt-3';
-            alertDiv.textContent = 'Order has been updated successfully!';
-            document.querySelector(`#${tableId}`).parentElement.appendChild(alertDiv);
-            
-            // Remove alert after 3 seconds
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 3000);
-            
-            // Reset button
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
+            if (response.success) {
+                alert('Order saved successfully!');
+                // Update the displayed order numbers
+                $(`#${type}-tbody tr:not(.no-sort)`).each(function(index) {
+                    $(this).find('.order-display').text(index + 1);
+                });
+            }
         },
-        error: function(error) {
-            // Show error message
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-danger mt-3';
-            alertDiv.textContent = 'Error updating order. Please try again.';
-            document.querySelector(`#${tableId}`).parentElement.appendChild(alertDiv);
-            
-            // Remove alert after 3 seconds
-            setTimeout(() => {
-                alertDiv.remove();
-            }, 3000);
-            
-            // Reset button
-            saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
-            
-            console.error('Error:', error);
+        error: function(xhr) {
+            alert('Error saving order');
+            console.error(xhr.responseText);
         }
     });
 }
 
+// Make the tables sortable if jQuery UI is available
+$(document).ready(function() {
+    if ($.fn.sortable) {
+        $(".sortable-table").sortable({
+            handle: ".handle",
+            update: function(event, ui) {
+                // Update the displayed order after drag
+                $(this).find('tr').each(function(index) {
+                    $(this).find('.order-display').text(index + 1);
+                });
+            }
+        });
+    }
+});
 // Set up inline editing
 function setupInlineEditing() {
     // Edit button click handlers
@@ -627,5 +647,5 @@ function setupImageUpload() {
         });
     });
 }
+
 </script>
-@endsecti

@@ -86,9 +86,7 @@
       position: absolute;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
       transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-      background-color: white;
     }
 
     .slide img {
@@ -231,20 +229,7 @@
       z-index: 200;
     }
 
-    @media (max-width: 768px) {
-      .main-title {
-        font-size: 2rem;
-      }
-      .subtitle {
-        font-size: 1.2rem;
-      }
-      .carousel-container {
-        height: 400px;
-      }
-      .navigation {
-        padding: 0 10%;
-      }
-    }
+
   </style>
 </head>
 <body>
@@ -253,15 +238,6 @@
       <h1 class="main-title">{{ $raffle->raffle_name }}</h1>
       <p class="subtitle">Win Amazing Prizes!</p>
     </div>
-
-    <div class="raffle-details">
-      <p><strong>Raffle ID:</strong> {{ $raffle->raffle_id }}</p>
-      <p><strong>Start Date:</strong> {{ $raffle->start_date }}</p>
-      <p><strong>End Date:</strong> {{ $raffle->end_date }}</p>
-    </div>
-
-    <div class="background-text top-text">PRIZES</div>
-    <div class="background-text bottom-text">WIN BIG</div>
 
     @if(count($prizes))
       <div x-data="carousel" class="w-full h-full">

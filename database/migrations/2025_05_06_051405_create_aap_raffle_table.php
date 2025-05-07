@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('ar_nameprizet', 100)->nullable();
             $table->integer('ar_noprize');
             $table->integer('ar_noattendees')->nullable();
-            $table->date('ar_date');
+            $table->date('ar_date')->nullable();
             $table->unsignedTinyInteger('ar_order');
             $table->string('raffle_image', 255);
         });

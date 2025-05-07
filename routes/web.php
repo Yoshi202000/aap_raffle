@@ -9,6 +9,9 @@ use App\Http\Controllers\AapRaffleController;
 Route::get('/raffles/index', function (){
     return view('index');
 });
+Route::get('/', function(){
+    return view('aap_raffle.index');
+});
 
 Route::get('/raffles/create', function () {
     return view('raffles.create');
@@ -37,7 +40,15 @@ Route::get('/aap_raffles/edit', [AapRaffleController::class, 'customEdit'])->nam
 
 Route::resource('aap_raffles', AapRaffleController::class);
 Route::post('/aap_raffles/update-order', [AapRaffleController::class, 'updateOrder'])->name('aap_raffles.updateOrder');
+Route::get('/aap_raffle/attendees', [AapRaffleController::class, 'createAttendees'])->name('aap_raffles.attendees');
+Route::get('/aap_raffle/members', [AapRaffleController::class, 'createMembers'])->name('aap_raffles.members');
+Route::get('/aap_raffles/{id}/edit-data', [RaffleController::class, 'getEditData'])->name('aap_raffles.edit_data');
 
 // Routes for inline editing
 Route::post('/aap_raffles/update-field/{id}', [AapRaffleController::class, 'updateField'])->name('aap_raffles.updateField');
 Route::post('/aap_raffles/update-image/{id}', [AapRaffleController::class, 'updateImage'])->name('aap_raffles.updateImage');
+
+Route::get('/get-edit-modal-content', function() {
+    return view('aap_raffle.edit_modal_content');
+});
+
