@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ $raffle->raffle_name }} - Details</title>
+  <title>{{ $raffle->ar_nameprize }} - Prize Showcase</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.12.0/cdn.js"></script>
   <style>
+    /* Copy all your CSS styles from the template */
     * {
       margin: 0;
       padding: 0;
@@ -26,6 +27,9 @@
       min-height: 100vh;
     }
 
+    /* Include all other styles from your template */
+    /* ... */
+    
     .container {
       margin: auto;
       width: 100%;
@@ -228,14 +232,12 @@
       text-align: center;
       z-index: 200;
     }
-
-
   </style>
 </head>
 <body>
   <div class="container">
     <div class="raffle-header">
-      <h1 class="main-title">{{ $raffle->raffle_name }}</h1>
+      <h1 class="main-title">{{ $raffle->ar_nameprize }}</h1>
       <p class="subtitle">Win Amazing Prizes!</p>
     </div>
 
@@ -276,7 +278,7 @@
       </div>
     @endif
     
-    <a href="{{ url('/raffles') }}" class="back-link">← Back to Raffles</a>
+    <a href="{{ route('aap_raffles.index') }}" class="back-link">← Back to Raffles</a>
   </div>
 
   <script>
@@ -363,7 +365,8 @@
             // Use lookup values or fallback
             const { scale, offsetX, offsetY, zIndex, opacity, rotation } = config[posKey] || fallback;
 
-return `transform: translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation || 0}deg); width: ${baseWidth}px; height: ${baseHeight}px; z-index: ${zIndex}; opacity: ${opacity}; left: calc(50% - ${baseWidth / 2}px); top: calc(50% - ${baseHeight / 2}px);`;          },
+            return `transform: translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation || 0}deg); width: ${baseWidth}px; height: ${baseHeight}px; z-index: ${zIndex}; opacity: ${opacity}; left: calc(50% - ${baseWidth / 2}px); top: calc(50% - ${baseHeight / 2}px);`;
+          },
 
           next() {
             if (this.images.length === 0) return;

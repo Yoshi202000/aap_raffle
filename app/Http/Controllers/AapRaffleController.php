@@ -12,6 +12,10 @@ class AapRaffleController extends Controller
         $raffles = AapRaffle::orderBy('ar_order', 'asc')->get();
         return view('aap_raffle.index', compact('raffles'));
     }
+    public function showcasetwo()
+    {
+        return view('aap_raffle.raffle_showcase');
+    }
     
 
     public function create()
@@ -33,7 +37,7 @@ class AapRaffleController extends Controller
             'ar_noattendees' => 'nullable|integer',
             'ar_date' => 'nullable|date',
             'ar_order' => 'required|integer|min:0|max:255',
-            'raffle_image' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+            'raffle_image' => 'required|file|mimes:jpg,jpeg,png|max:20048',
         ]);
 
         if ($request->hasFile('raffle_image')) {
@@ -71,7 +75,7 @@ public function show(AapRaffle $aap_raffle)
             'ar_noattendees' => 'nullable|integer',
             'ar_date' => 'nullable|date',
             'ar_order' => 'required|integer|min:0|max:255',
-            'raffle_image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
+            'raffle_image' => 'nullable|file|mimes:jpg,jpeg,png|max:20048',
         ]);
 
         if ($request->hasFile('raffle_image')) {
@@ -153,18 +157,15 @@ public function updateImage(Request $request, $id)
 {
     $raffle = AapRaffle::findOrFail($id);
     
-    // Validate the image
     $request->validate([
-        'raffle_image' => 'required|file|mimes:jpg,jpeg,png|max:2048',
+        'raffle_image' => 'required|file|mimes:jpg,jpeg,png|max:20048',
     ]);
     
-    // Upload the new image
     if ($request->hasFile('raffle_image')) {
         $image = $request->file('raffle_image');
         $imageName = time() . '_' . $image->getClientOriginalName();
         $image->move(public_path('images'), $imageName);
         
-        // Update the raffle entry
         $raffle->raffle_image = 'images/' . $imageName;
         $raffle->save();
         
@@ -176,5 +177,50 @@ public function updateImage(Request $request, $id)
     }
     
     return response()->json(['error' => 'No image provided'], 400);
+}
+
+public function carouselAll()
+{
+    $allRaffles = AapRaffle::where('ar_members', 1)->orderBy('ar_order', 'asc')->get();
+    
+    $prizes = [];
+    
+    foreach ($allRaffles as $raffle) {
+        $prizes[] = [
+            'prize_name' => $raffle->ar_nameprize,
+            'prize_image' => $raffle->raffle_image,
+            'prize_count' => $raffle->ar_noprize,
+            'raffle_id' => $raffle->ar_id,
+            'description' => $raffle->ar_nameprizet
+        ];
+    }
+    
+    return view('aap_raffle.all_carousel', [
+        'prizes' => $prizes,
+        'title' => 'All Raffle Prizes'
+    ]);
+}
+public function attendeesCarousel()
+{
+    // Get all raffles that have ar_members == 0, ordered by ar_order
+    $allRaffles = AapRaffle::where('ar_members', 0)->orderBy('ar_order', 'asc')->get();
+    
+    // Format them for the carousel
+    $prizes = [];
+    
+    foreach ($allRaffles as $raffle) {
+        $prizes[] = [
+            'prize_name' => $raffle->ar_nameprize,
+            'prize_image' => $raffle->raffle_image,
+            'prize_count' => $raffle->ar_noprize,
+            'raffle_id' => $raffle->ar_id,
+            'description' => $raffle->ar_nameprizet
+        ];
+    }
+    
+    return view('aap_raffle.attendees_carousel', [
+        'prizes' => $prizes,
+        'title' => 'Attendee Raffle Prizes'
+    ]);
 }
 }

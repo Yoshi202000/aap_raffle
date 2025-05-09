@@ -108,6 +108,9 @@
                                         Create Members Raffle
                                     </button>
                                     </div>
+                                    <div class="text-center mb-4">
+                                        <a href="{{ route('aap_raffles.carousel_all') }}" class="btn btn-primary">Start Rolling Raffle</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -203,6 +206,10 @@
                                         </button>
                                     </div>
                                 </div>
+                                
+                                    <div class="text-center mb-4">
+                                        <a href="{{ route('aap_raffles.attendees') }}" class="btn btn-info">Attendee Prizes</a>
+                                    </div>
                             </div>
                         </div>
                     </div>

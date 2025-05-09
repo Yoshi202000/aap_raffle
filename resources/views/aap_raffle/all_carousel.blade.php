@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>{{ $raffle->raffle_name }} - Details</title>
+  <title>{{ $title }} - Prize Showcase</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.12.0/cdn.js"></script>
   <style>
@@ -229,14 +229,23 @@
       z-index: 200;
     }
 
-
+    .prize-badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #fde047;
+      color: #1e3a8a;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="raffle-header">
-      <h1 class="main-title">{{ $raffle->raffle_name }}</h1>
-      <p class="subtitle">Win Amazing Prizes!</p>
+      <h1 class="main-title">{{ $title }}</h1>
+      <p class="subtitle">All Available Prizes</p>
     </div>
 
     @if(count($prizes))
@@ -250,6 +259,7 @@
               <template x-if="!slide.prize_image">
                 <img src="/images/no-image.png" :alt="slide.prize_name">
               </template>
+              <div class="prize-badge" x-text="slide.prize_count + ' available'"></div>
             </div>
           </template>
 
@@ -272,11 +282,11 @@
       </div>
     @else
       <div class="no-prizes">
-        <p>No prizes available for this raffle.</p>
+        <p>No prizes available for display.</p>
       </div>
     @endif
     
-    <a href="{{ url('/raffles') }}" class="back-link">← Back to Raffles</a>
+    <a href="{{ route('aap_raffles.index') }}" class="back-link">← Back to Raffles</a>
   </div>
 
   <script>
@@ -292,6 +302,7 @@
           
           startDraw() {
             this.isDrawing = true;
+            // You can add additional functionality here if needed
           },
 
           init() {
@@ -363,7 +374,8 @@
             // Use lookup values or fallback
             const { scale, offsetX, offsetY, zIndex, opacity, rotation } = config[posKey] || fallback;
 
-return `transform: translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation || 0}deg); width: ${baseWidth}px; height: ${baseHeight}px; z-index: ${zIndex}; opacity: ${opacity}; left: calc(50% - ${baseWidth / 2}px); top: calc(50% - ${baseHeight / 2}px);`;          },
+            return `transform: translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation || 0}deg); width: ${baseWidth}px; height: ${baseHeight}px; z-index: ${zIndex}; opacity: ${opacity}; left: calc(50% - ${baseWidth / 2}px); top: calc(50% - ${baseHeight / 2}px);`;
+          },
 
           next() {
             if (this.images.length === 0) return;
