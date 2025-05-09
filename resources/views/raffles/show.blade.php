@@ -343,10 +343,10 @@
 
             const config = {
                 '0': { scale: 1.0, offsetX: 0, offsetY: 0, zIndex: 100, opacity: 1 },
-                '1': { scale: 0.4, offsetX: 350, offsetY: 160, zIndex: 90, opacity: 0.9 },
-                '-1': { scale: 0.4, offsetX: -350, offsetY: 160, zIndex: 90, opacity: 0.9 },
-                '2': { scale: 0.3, offsetX: 560, offsetY: 230, zIndex: 80, opacity: 0.9 },
-                '-2': { scale: 0.3, offsetX: -560, offsetY: 230, zIndex: 80, opacity: 0.9 }
+                '1': { scale: 0.7, offsetX: 350, offsetY: 160, zIndex: 90, opacity: 0.9, rotation: 5},
+                '-1': { scale: 0.7, offsetX: -350, offsetY: 160, zIndex: 90, opacity: 0.9, rotation: -5},
+                '2': { scale: 0.3, offsetX: 560, offsetY: 230, zIndex: 80, opacity: 0.9, rotation: 10},
+                '-2': { scale: 0.3, offsetX: -560, offsetY: 230, zIndex: 80, opacity: 0.9, rotation: -10 }
             };
 
             const posKey = position.toString();

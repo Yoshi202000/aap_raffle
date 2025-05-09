@@ -9,9 +9,10 @@ class AapRaffleController extends Controller
 {
     public function index()
     {
-        $raffles = AapRaffle::all();
+        $raffles = AapRaffle::orderBy('ar_order', 'asc')->get();
         return view('aap_raffle.index', compact('raffles'));
     }
+    
 
     public function create()
 {
@@ -30,7 +31,7 @@ class AapRaffleController extends Controller
             'ar_nameprizet' => 'nullable|string|max:100',
             'ar_noprize' => 'required|integer',
             'ar_noattendees' => 'nullable|integer',
-            'ar_date' => 'required|date',
+            'ar_date' => 'nullable|date',
             'ar_order' => 'required|integer|min:0|max:255',
             'raffle_image' => 'required|file|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -68,7 +69,7 @@ public function show(AapRaffle $aap_raffle)
             'ar_nameprizet' => 'nullable|string|max:100',
             'ar_noprize' => 'required|integer',
             'ar_noattendees' => 'nullable|integer',
-            'ar_date' => 'required|date',
+            'ar_date' => 'nullable|date',
             'ar_order' => 'required|integer|min:0|max:255',
             'raffle_image' => 'nullable|file|mimes:jpg,jpeg,png|max:2048',
         ]);
@@ -124,6 +125,11 @@ public function updateField(Request $request, $id)
         case 'ar_noattendees':
             $validator = Validator::make(['ar_noattendees' => $value], [
                 'ar_noattendees' => 'nullable|integer|min:0',
+            ]);
+            break;
+        case 'ar_noprize':
+            $validator = Validator::make(['ar_noprize' => $value],[
+                'ar_noprize' => 'required|integer|min:0',
             ]);
             break;
         default:

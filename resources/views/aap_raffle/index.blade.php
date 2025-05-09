@@ -31,6 +31,7 @@
                                                 <tr>
                                                     <th width="5%">Order</th>
                                                     <th width="35%">Prize Name</th>
+                                                    <th>no.</th>
                                                     <th width="20%">Image</th>
                                                     <th width="10%">Actions</th>
                                                 </tr>
@@ -51,6 +52,11 @@
                                                                 </div>
                                                             </td>
                                                             <td>
+                                                                <div class="editable-fields" data-firld="ar_noprize" data-id="{{ $raffle->ar_id }}">
+                                                                <span class="editable-text">{{ $raffle->ar_noprize }}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td>
                                                                 <div class="image-upload-container">
                                                                     @if($raffle->raffle_image)
                                                                         <img src="{{ asset($raffle->raffle_image) }}" class="img-thumbnail" style="max-height: 50px;">
@@ -68,8 +74,8 @@
                                                                 <div class="btn-group" role="group">
                                                                     <form action="">
                                                                     <button type="button" class="Edit-button btn btn-primary btn-sm" data-id="{{ $raffle->ar_id }}">
-    <i class="fas fa-edit"></i> Edit
-</button>
+                                                                        <i class="fas fa-edit"></i> Edit
+                                                                    </button>
                                                                     </form>
                                                                     <form action="{{ route('aap_raffles.destroy', $raffle->ar_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this raffle?');" style="display: inline-block;">
                                                                         @csrf
@@ -120,6 +126,7 @@
                                                     <th width="5%">Order</th>
                                                     <th width="35%">Prize Name</th>
                                                     <th width="20%">Image</th>
+                                                    <th>no.</th>
                                                     <th width="10%">Actions</th>
                                                 </tr>
                                             </thead>
@@ -138,7 +145,11 @@
                                                                     <span class="editable-text">{{ $raffle->ar_nameprize }}</span>
                                                                 </div>
                                                             </td>
-                                                            
+                                                            <td>
+                                                                <div class="editable-fields" data-firld="ar_noprize" data-id="{{ $raffle->ar_id }}">
+                                                                <span class="editable-text">{{ $raffle->ar_noprize }}</span>
+                                                                </div>
+                                                            </td>
                                                             <td>
                                                                 <div class="image-upload-container">
                                                                     @if($raffle->raffle_image)
@@ -157,8 +168,9 @@
                                                                 <div class="btn-group" role="group">
                                                                     <form action="" class="display: inline-block;">
                                                                     <button type="button" class="Edit-button btn btn-primary btn-sm" data-id="{{ $raffle->ar_id }}">
-    <i class="fas fa-edit"></i> Edit
-</button></form>
+                                                                        <i class="fas fa-edit"></i> Edit
+                                                                    </button>
+                                                                    </form>
                                                                     <form action="{{ route('aap_raffles.destroy', $raffle->ar_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this raffle?');" style="display: inline-block;">
                                                                         @csrf
                                                                         @method('DELETE')
@@ -199,40 +211,56 @@
         </div>
     </div>
 </div>
+<!-- Edit Raffle Modal -->
+<div class="modal fade" id="editRaffleModal" tabindex="-1" role="dialog" aria-labelledby="editRaffleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editRaffleModalLabel">Edit Raffle</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="editRaffleForm" method="POST" enctype="multipart/form-data">
+          @csrf
+          @method('PUT')
+          <input type="hidden" class="form-control" id="ar_order" name="ar_order">
+          <input type="hidden" class="form-control" id="ar_date" name="ar_date">
+
+          <div class="form-group">
+            <label for="ar_nameprize">Prize Name</label>
+            <input type="text" class="form-control" id="ar_nameprize" name="ar_nameprize" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="ar_noprize">Number of Prizes</label>
+            <input type="number" class="form-control" id="ar_noprize" name="ar_noprize" required>
+          </div>
+          
+          <!-- Add hidden fields for other required inputs with default values -->
+          <input type="hidden" name="ar_members" value="1">
+          
+          <div class="form-group">
+            <label for="raffle_image">Image</label>
+            <input type="file" class="form-control-file" id="raffle_image" name="raffle_image">
+            <img id="current_image" class="img-thumbnail mt-2" style="max-height: 100px; display: none;">
+          </div>
+          
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- Hidden file input for image uploads -->
 <form id="image-upload-form" style="display: none;">
     <input type="file" id="image-upload-input" name="raffle_image" accept="image/jpeg,image/png,image/jpg">
 </form>
-
-<!-- Inline Edit Modal -->
-<div class="modal fade" id="inline-edit-modal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Field</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="inline-edit-form">
-                    <input type="hidden" id="edit-field-name">
-                    <input type="hidden" id="edit-raffle-id">
-                    
-                    <div class="form-group">
-                        <label for="edit-field-value">Value:</label>
-                        <input type="text" class="form-control" id="edit-field-value">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="save-edit-btn">Save</button>
-            </div>
-        </div>
-    </div>
-</div>
 @include('aap_raffle.edit_modal')
 
 <!-- CSRF Token Meta -->
@@ -308,6 +336,105 @@
 </style>
 
 <script>
+// Click handler for Edit button
+$(document).on('click', '.Edit-button', function() {
+    const raffleId = $(this).data('id');
+
+    // Fetch data from table row
+    const row = $(this).closest('tr');
+    const prizeName = row.find('.prize-name .editable-text').text().trim();
+    const prizeNo = row.find('[data-firld="ar_noprize"] .editable-text').text().trim(); // Note: fixing this typo in HTML would be better
+    const order = row.data('order');
+    const imageSrc = row.find('img').attr('src') || '';
+
+    // Populate modal fields
+    $('#ar_nameprize').val(prizeName);
+    $('#ar_noprize').val(prizeNo);
+    $('#ar_order').val(order);
+    
+    // Set image if it exists
+    if (imageSrc) {
+        $('#current_image').attr('src', imageSrc).show();
+    } else {
+        $('#current_image').hide();
+    }
+
+    // Set the form action - fix the route structure
+    $('#editRaffleForm').attr('action', `/aap_raffles/${raffleId}`);
+
+    // Show modal
+    $('#editRaffleModal').modal('show');
+});
+
+// Form submission handler
+$('#editRaffleForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const raffleId = $('#editRaffleForm').attr('action').split('/').pop();
+    
+    
+    $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST', // Will be converted to PUT by the @method('PUT') in your form
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            $('#editRaffleModal').modal('hide');
+            // Show success message
+            alert('Raffle updated successfully!');
+            // Refresh the page to show updated data
+            window.location.reload();
+        },
+        error: function(xhr) {
+            console.error('Error updating raffle:', xhr.responseText);
+            let errorMessage = 'Error updating raffle.';
+            
+            // Try to parse error messages from Laravel validation
+            try {
+                const errors = JSON.parse(xhr.responseText);
+                if (errors.errors) {
+                    errorMessage = Object.values(errors.errors).flat().join('\n');
+                } else if (errors.message) {
+                    errorMessage = errors.message;
+                }
+            } catch (e) {
+                // If parsing fails, use generic message
+            }
+            
+            alert(errorMessage);
+        }
+    });
+});
+
+// Add form submission handler to ensure proper submission
+$('#editRaffleForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const raffleId = $('#raffle_id').val();
+    
+    $.ajax({
+        url: $(this).attr('action'),
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            $('#editRaffleModal').modal('hide');
+            // Refresh the page or update the row with new data
+            window.location.reload();
+        },
+        error: function(xhr) {
+            console.error('Error updating raffle:', xhr.responseText);
+            alert('Error updating raffle. Please check the form and try again.');
+        }
+    });
+});
+
+
+
 // Function to get next order number for a specific table
 function getNextOrderNumber(tableId) {
     const rows = document.querySelectorAll(`#${tableId} tr:not(.no-sort)`);
