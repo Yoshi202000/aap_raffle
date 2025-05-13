@@ -150,8 +150,39 @@
       height: 100%;
       position: absolute;
       overflow: visible;
-      transition: all 1.5s cubic-bezier(.22,1,.36,1);
+      transition: all 0.8s cubic-bezier(.22,1,.36,1);
     }
+    .slide > div {
+    transition: margin-top 0.7s ease-out;
+  }
+  .fade-in {
+  animation: fadeInEffect 0.5s ease-in forwards;
+}
+  .fade-out {
+  animation: fadeOutEffect 0.5s ease-out forwards;
+}
+
+@keyframes fadeInEffect {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOutEffect {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
 
     .slide img {
       width: 100%;
@@ -306,6 +337,7 @@
       padding: 5px 10px;
       border-radius: 20px;
     }
+
     .move-up {
   animation: moveUpMargin 0.7s ease-out forwards;
 }
@@ -318,6 +350,63 @@
     margin-top: -30px;
   }
 }
+
+@keyframes moveDownMargin {
+  0% {
+    margin-top: -30px;
+  }
+  100% {
+    margin-top: 0;
+  }
+}
+
+/* Make sure the digits-container is properly positioned and fades smoothly */
+.digits-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  position: absolute;
+  top: 400px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  z-index: 150;
+  transition: opacity 0.5s ease-out;
+}
+
+.title {
+  transition: opacity 0.5s ease-out;
+}
+
+/* Enhanced digit animations */
+.digit {
+  width: 60px;
+  height: 80px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 36px;
+  font-weight: bold;
+  transition: transform 0.2s ease-out;
+}
+
+/* Ensure navigation buttons fade in smoothly */
+.navigation {
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* Make sure the back button doesn't disappear too quickly */
+.back-button {
+  transition: opacity 0.3s ease-out;
+}
+.move-down {
+  animation: moveDownMargin 0.8s ease-out forwards;
+}
   </style>
 </head>
 <body>
@@ -326,47 +415,55 @@
     @if(count($prizes))
       <div x-data="carousel" class="container">
         <div class="carousel-container">
-          <template x-for="(slide, index) in slides" :key="index">
-            <div class="slide" 
-            :style="getSlideStyle(slide.position)"
-            > 
-            <div :class="{ 'move-up': isDrawing && slide.position === 0 }">
-              <template x-if="slide.prize_image">
-                <img :src="slide.prize_image" :alt="slide.prize_name">
-              </template>
-              <template x-if="!slide.prize_image">
-                <img src="/images/no-image.png" :alt="slide.prize_name">
-              </template>
-              <div class="prize-badge" x-text="slide.prize_count + ' available'"></div>
-            </div>
-            </div>
-          </template>
+  <template x-for="(slide, index) in slides" :key="index">
+    <div class="slide" 
+      :style="getSlideStyle(slide.position)"
+    > 
+      <!-- Apply animations based on state -->
+      <div :class="{ 
+        'move-up': isDrawing && !isReturning,
+        'move-down': isReturning
+      }">
+        <template x-if="slide.prize_image">
+          <img :src="slide.prize_image" :alt="slide.prize_name">
+        </template>
+        <template x-if="!slide.prize_image">
+          <img src="/images/no-image.png" :alt="slide.prize_name">
+        </template>
+        <div class="prize-badge" x-text="slide.prize_count + ' available'"></div>
+      </div>
+    </div>
+  </template>
 
-         
-
-          <div  x-show="isNext" class="navigation">
-            <div @click="prev()" class="nav-button-left"></div>
-            <div @click="next()" class="nav-button-right"></div>
-          </div>
-          
-           
-         <div  x-show="isDrawing" class="title">THE LUCKY WINNER IS</div>
-            <div  x-show="isDrawing" class="digits-container">
-                <div class="digit" id="digit-1">-</div>
-                <div class="digit" id="digit-2">-</div>
-                <div class="digit" id="digit-3">-</div>
-                <div class="digit" id="digit-4">-</div>
-                <div class="digit" id="digit-5">-</div>
-                <div class="digit" id="digit-6">-</div>
-                <div class="digit" id="digit-7">-</div>
-            </div>
-        </div>
+  <div x-show="isNext || isReturning" 
+       :class="{ 'fade-in': isReturning }"
+       class="navigation">
+    <div @click="prev()" class="nav-button-left"></div>
+    <div @click="next()" class="nav-button-right"></div>
+  </div>
+  
+  <div x-show="isDrawing" 
+       :class="{ 'fade-in': isDrawing && !isReturning, 'fade-out': isReturning }" 
+       class="title">THE LUCKY WINNER IS</div>
+  
+  <div x-show="isDrawing" 
+       :class="{ 'fade-in': isDrawing && !isReturning, 'fade-out': isReturning }" 
+       class="digits-container">
+    <div class="digit" id="digit-1">-</div>
+    <div class="digit" id="digit-2">-</div>
+    <div class="digit" id="digit-3">-</div>
+    <div class="digit" id="digit-4">-</div>
+    <div class="digit" id="digit-5">-</div>
+    <div class="digit" id="digit-6">-</div>
+    <div class="digit" id="digit-7">-</div>
+  </div>
+</div>
         <button class="cta-button" x-show="!isDrawing" @click="startDraw()">START DRAW</button>
         <div class="product-name" x-text="currentSlide.prize_name"></div>
         <div class="prize-counter">
           Prize <span x-text="currentIndex + 1"></span> of <span x-text="images.length"></span>
         </div>
-        <button class="back-button" @click="stopDraw()" >Back to Raffles</button>    
+        <button class="back-button" x-show="isDrawing" @click="stopDraw()" >Back to Raffles</button>    
       </div>
     @else
       <div class="no-prizes">
@@ -378,108 +475,197 @@
 
   <script>
     window.raffleImages = @json($prizes);
-    
+  
     document.addEventListener('alpine:init', () => {
-      Alpine.data('carousel', () => {
-        return {
-          currentIndex: 0,
-          images: [],
-          isDrawing: false,
-          isNext: true,
+  Alpine.data('carousel', () => {
+    return {
+      currentIndex: 0,
+      images: [],
+      isDrawing: false,
+      isNext: true,
+      isReturning: false, 
+      returnedSlides: [], 
+      startDraw() {
+        this.isDrawing = true;
+        this.isNext = false;
+        this.animateDigits();
+      },
 
-          startDraw() {
-            this.isDrawing = true;
-            this.isNext = false;
-          },
-
-          stopDraw() {
-            this.isDrawing = false;
-            this.isNext = true;
-          },
-
-          init() {
-            this.images = window.raffleImages || [];
+      stopDraw() {
+        this.isReturning = true;
+        
+        this.returnedSlides = [];
+        const total = this.images.length;
+        
+        if (total > 0) {
+          for (let i = 0; i < total; i++) {
+            // Calculate position relative to current index
+            let position;
             
-            this.images = this.images.map(prize => ({
-              ...prize,
-              prize_image: prize.prize_image 
-                ? (prize.prize_image.startsWith('/') ? prize.prize_image : '/' + prize.prize_image)
-                : '/images/no-image.png'
-            }));
-          },
-
-          get currentSlide() {
-            return this.images[this.currentIndex] || {};
-          },
-
-          get slides() {
-            if (this.isDrawing) {
-              return [{
-                ...this.currentSlide,
-                position: 0
-              }];
+            if (i === this.currentIndex) {
+              position = 0;
+            } else if (i > this.currentIndex) {
+              const diff = i - this.currentIndex;
+              position = diff <= Math.floor(total / 2) ? diff : diff - total;
+            } else {
+              const diff = this.currentIndex - i;
+              position = diff <= Math.floor(total / 2) ? -diff : total - diff;
             }
-          
-            const result = [];
-            const total = this.images.length;
             
-            if (total === 0) return [];
-
-            for (let i = 0; i < total; i++) {
-              const relativePos = (i - this.currentIndex + total) % total;
-              const normalizedPos = relativePos > Math.floor(total / 2) ? relativePos - total : relativePos;
-              
-              result.push({
-                ...this.images[i],
-                position: normalizedPos
-              });
-            }
-
-            return result;
-          },
-
-          getSlideStyle(position) {
-            const baseWidth = 340;
-            const baseHeight = 380;
-
-            const config = {
-                '0': { scale: 1.5, offsetX: 0, offsetY: 160, zIndex: 100, opacity: 1 },
-                '1': { scale: 0.7, offsetX: 350, offsetY: 160, zIndex: 90, opacity: 0.9, rotation: -5},
-                '-1': { scale: 0.7, offsetX: -350, offsetY: 160, zIndex: 90, opacity: 0.9, rotation: 5},
-                '2': { scale: 0.3, offsetX: 560, offsetY: 230, zIndex: 80, opacity: 0.9, rotation: -10},
-                '-2': { scale: 0.3, offsetX: -560, offsetY: 230, zIndex: 80, opacity: 0.9, rotation: 10 }
-            };
-
-            const posKey = position.toString();
-            
-            const fallback = {
-              scale: 0.1,
-              offsetX: position > 0 ? 550 : -550,
-              offsetY: 90,
-              zIndex: 70,
-              opacity: 0,
-              rotation: 0,
-            };
-
-            const { scale, offsetX, offsetY, zIndex, opacity, rotation } = config[posKey] || fallback;
-
-            return `transform: translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation || 0}deg); width: ${baseWidth}px; height: ${baseHeight}px; z-index: ${zIndex}; opacity: ${opacity}; left: calc(50% - ${baseWidth / 2}px); top: calc(50% - ${baseHeight / 2}px);`;
-          },
-
-          next() {
-            if (this.images.length === 0) return;
-            this.currentIndex = (this.currentIndex + 1) % this.images.length;
-          },
-
-          prev() {
-            if (this.images.length === 0) return;
-            this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+            this.returnedSlides.push({
+              ...this.images[i],
+              position: position,
+              isCenter: position === 0
+            });
           }
         }
-      });
-    });
+        
+        // Delay state change until animation completes
+        setTimeout(() => {
+          this.isDrawing = false;
+          this.isNext = true;
+          this.isReturning = false;
+          this.returnedSlides = [];
+        }, 1000); // Animation duration
+      },
 
+      animateDigits() {
+        const digits = Array.from({ length: 7 }, (_, i) => document.getElementById(`digit-${i+1}`));
+        
+        // Reset digits
+        digits.forEach(digit => {
+          if (digit) digit.textContent = '-';
+        });
+        
+        digits.forEach((digit, index) => {
+          if (!digit) return;
+          
+          let randomAnimationTime = 1000 + (index * 300);
+          let animationInterval;
+          
+          const startAnimation = () => {
+            animationInterval = setInterval(() => {
+              digit.textContent = Math.floor(Math.random() * 10);
+              digit.style.animation = 'digitChange 0.1s ease-in-out';
+              
+              setTimeout(() => {
+                digit.style.animation = 'none';
+              }, 100);
+            }, 100);
+            
+            setTimeout(() => {
+              clearInterval(animationInterval);
+              digit.textContent = Math.floor(Math.random() * 10);
+            }, randomAnimationTime);
+          };
+          
+          setTimeout(startAnimation, index * 300);
+        });
+      },
 
+      init() {
+        this.images = window.raffleImages || [];
+        
+        this.images = this.images.map(prize => ({
+          ...prize,
+          prize_image: prize.prize_image 
+            ? (prize.prize_image.startsWith('/') ? prize.prize_image : '/' + prize.prize_image)
+            : '/images/no-image.png'
+        }));
+      },
+
+      get currentSlide() {
+        return this.images[this.currentIndex] || {};
+      },
+
+      get slides() {
+        // If we're in the returning animation phase, show all slides transitioning back
+        if (this.isReturning) {
+          return this.returnedSlides;
+        }
+        
+        // If in drawing mode (and not returning), just show the center slide
+        if (this.isDrawing) {
+          return [{
+            ...this.currentSlide,
+            position: 0
+          }];
+        }
+      
+        // Normal carousel mode
+        const result = [];
+        const total = this.images.length;
+        
+        if (total === 0) return [];
+
+        for (let i = 0; i < total; i++) {
+          let position;
+          
+          if (i === this.currentIndex) {
+            position = 0;
+          } else if (i > this.currentIndex) {
+            const diff = i - this.currentIndex;
+            position = diff <= Math.floor(total / 2) ? diff : diff - total;
+          } else {
+            const diff = this.currentIndex - i;
+            position = diff <= Math.floor(total / 2) ? -diff : total - diff;
+          }
+          
+          result.push({
+            ...this.images[i],
+            position: position,
+            isCenter: position === 0 
+          });
+        }
+
+        return result;
+      },
+
+      getSlideStyle(position) {
+        const baseWidth = 340;
+        const baseHeight = 380;
+
+        const config = {
+          '0': { scale: 1.5, offsetX: 0, offsetY: 160, zIndex: 100, opacity: 1 },
+          '1': { scale: 0.7, offsetX: 350, offsetY: 160, zIndex: 90, opacity: 0.9, rotation: -5},
+          '-1': { scale: 0.7, offsetX: -350, offsetY: 160, zIndex: 90, opacity: 0.9, rotation: 5},
+          '2': { scale: 0.3, offsetX: 560, offsetY: 230, zIndex: 80, opacity: 0.9, rotation: -10},
+          '-2': { scale: 0.3, offsetX: -560, offsetY: 230, zIndex: 80, opacity: 0.9, rotation: 10 }
+        };
+
+        const posKey = position.toString();
+        
+        const fallback = {
+          scale: 0.1,
+          offsetX: position > 0 ? 550 : -550,
+          offsetY: 90,
+          zIndex: 70,
+          opacity: 0,
+          rotation: 0,
+        };
+
+        const { scale, offsetX, offsetY, zIndex, opacity, rotation } = config[posKey] || fallback;
+
+        // Adjust transition timing for return animation
+        const transitionTiming = this.isReturning 
+          ? "transform 1s cubic-bezier(.22,1,.36,1), opacity 1s cubic-bezier(.22,1,.36,1)" 
+          : "transform 0.5s cubic-bezier(.22,1,.36,1), opacity 0.5s cubic-bezier(.22,1,.36,1)";
+
+        return `transform: translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation || 0}deg); width: ${baseWidth}px; height: ${baseHeight}px; z-index: ${zIndex}; opacity: ${opacity}; left: calc(50% - ${baseWidth / 2}px); top: calc(50% - ${baseHeight / 2}px); transition: ${transitionTiming};`;
+      },
+
+      next() {
+        if (this.images.length === 0) return;
+        this.currentIndex = (this.currentIndex + 1) % this.images.length;
+      },
+
+      prev() {
+        if (this.images.length === 0) return;
+        this.currentIndex = (this.currentIndex - 1 + this.images.length) % this.images.length;
+      }
+    }
+  });
+});
   </script>
 </body>
 </html>
