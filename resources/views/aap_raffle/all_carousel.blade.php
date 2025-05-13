@@ -36,6 +36,71 @@
       margin-bottom: 20px;
     }
 
+    .title {
+            color: #ffde00;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+
+        .digits-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            position: absolute;
+            top: 400px;
+            left: 450px;
+        }
+        
+        .digit {
+            width: 60px;
+            height: 80px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .winner-box {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 18px;
+            display: none;
+            animation: fadeIn 0.5s ease-in-out forwards;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+         @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+            to {
+                opacity: a;
+                transform: translate(-50%, 0);
+            }
+        }
+        
+        @keyframes digitChange {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
     .main-title {
       font-size: 3rem;
       font-weight: 900;
@@ -78,20 +143,19 @@
       width: 100%;
       position: relative;
       height: 500px;
-      overflow: hidden;
-      margin: 40px 0;
+        overflow: hidden;
     }
 
     .slide {
+      height: 100%;
       position: absolute;
-      border-radius: 8px;
-      overflow: hidden;
+      overflow: visible;
       transition: all 1.5s cubic-bezier(.22,1,.36,1);
     }
 
     .slide img {
       width: 100%;
-      height: 70%;
+      height: 100%;
       object-fit: contain;
       padding: 10px;
     }
@@ -103,18 +167,21 @@
 
     .product-name {
       font-size: 1.2rem;
-      font-weight: 700;
-      color: #1e3a8a;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-      text-align: center;
-      position: absolute;
-      bottom: 15%;
-      left: 0;
-      right: 0;
-      margin: 10px;
+  font-weight: 700;
+  color: #ffff;
+  text-transform: uppercase;
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 95px; 
+  margin: 0 10px;
+  padding: 10px 0;
     }
-
+.back-button{
+  position: absolute;
+  bottom: 95px;
+}
     .prize-value {
       font-size: 1rem;
       color: #333;
@@ -178,7 +245,7 @@
 
     .prize-counter {
       text-align: center;
-      margin: 20px 0;
+      margin: 20px;     
       font-weight: bold;
       color: white;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
@@ -216,7 +283,7 @@
 
     .winner-box {
       position: absolute;
-      top: 60%;
+      top: 70%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: white;
@@ -239,20 +306,31 @@
       padding: 5px 10px;
       border-radius: 20px;
     }
+    .move-up {
+  animation: moveUpMargin 0.7s ease-out forwards;
+}
+
+@keyframes moveUpMargin {
+  0% {
+    margin-top: 0;
+  }
+  100% {
+    margin-top: -30px;
+  }
+}
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="raffle-header">
-      <h1 class="main-title">{{ $title }}</h1>
-      <p class="subtitle">All Available Prizes</p>
-    </div>
 
     @if(count($prizes))
-      <div x-data="carousel" class="w-full h-full">
+      <div x-data="carousel" class="container">
         <div class="carousel-container">
           <template x-for="(slide, index) in slides" :key="index">
-            <div class="slide" :style="getSlideStyle(slide.position)">
+            <div class="slide" 
+            :style="getSlideStyle(slide.position)"
+            > 
+            <div :class="{ 'move-up': isDrawing && slide.position === 0 }">
               <template x-if="slide.prize_image">
                 <img :src="slide.prize_image" :alt="slide.prize_name">
               </template>
@@ -261,36 +339,44 @@
               </template>
               <div class="prize-badge" x-text="slide.prize_count + ' available'"></div>
             </div>
+            </div>
           </template>
 
-          <div x-show="isDrawing" x-transition class="winner-box">
-            Congratulations! <span x-text="currentSlide.prize_name"></span>
-          </div>
+         
 
-          <div class="navigation">
+          <div  x-show="isNext" class="navigation">
             <div @click="prev()" class="nav-button-left"></div>
             <div @click="next()" class="nav-button-right"></div>
           </div>
+          
+           
+         <div  x-show="isDrawing" class="title">THE LUCKY WINNER IS</div>
+            <div  x-show="isDrawing" class="digits-container">
+                <div class="digit" id="digit-1">-</div>
+                <div class="digit" id="digit-2">-</div>
+                <div class="digit" id="digit-3">-</div>
+                <div class="digit" id="digit-4">-</div>
+                <div class="digit" id="digit-5">-</div>
+                <div class="digit" id="digit-6">-</div>
+                <div class="digit" id="digit-7">-</div>
+            </div>
         </div>
-        
+        <button class="cta-button" x-show="!isDrawing" @click="startDraw()">START DRAW</button>
         <div class="product-name" x-text="currentSlide.prize_name"></div>
-        <button class="cta-button" @click="startDraw()">START DRAW</button>
-        
         <div class="prize-counter">
           Prize <span x-text="currentIndex + 1"></span> of <span x-text="images.length"></span>
         </div>
+        <button class="back-button" @click="stopDraw()" >Back to Raffles</button>    
       </div>
     @else
       <div class="no-prizes">
         <p>No prizes available for display.</p>
+        
       </div>
     @endif
-    
-    <a href="{{ route('aap_raffles.index') }}" class="back-link">← Back to Raffles</a>
   </div>
 
   <script>
-    // Pass the Laravel data to Alpine.js
     window.raffleImages = @json($prizes);
     
     document.addEventListener('alpine:init', () => {
@@ -299,17 +385,21 @@
           currentIndex: 0,
           images: [],
           isDrawing: false,
-          
+          isNext: true,
+
           startDraw() {
             this.isDrawing = true;
-            // You can add additional functionality here if needed
+            this.isNext = false;
+          },
+
+          stopDraw() {
+            this.isDrawing = false;
+            this.isNext = true;
           },
 
           init() {
-            // Initialize with prizes data from Laravel
             this.images = window.raffleImages || [];
             
-            // Map the prize data to the expected format for the carousel
             this.images = this.images.map(prize => ({
               ...prize,
               prize_image: prize.prize_image 
@@ -353,7 +443,7 @@
             const baseHeight = 380;
 
             const config = {
-                '0': { scale: 1.0, offsetX: 0, offsetY: 0, zIndex: 100, opacity: 1 },
+                '0': { scale: 1.5, offsetX: 0, offsetY: 160, zIndex: 100, opacity: 1 },
                 '1': { scale: 0.7, offsetX: 350, offsetY: 160, zIndex: 90, opacity: 0.9, rotation: -5},
                 '-1': { scale: 0.7, offsetX: -350, offsetY: 160, zIndex: 90, opacity: 0.9, rotation: 5},
                 '2': { scale: 0.3, offsetX: 560, offsetY: 230, zIndex: 80, opacity: 0.9, rotation: -10},
@@ -371,7 +461,6 @@
               rotation: 0,
             };
 
-            // Use lookup values or fallback
             const { scale, offsetX, offsetY, zIndex, opacity, rotation } = config[posKey] || fallback;
 
             return `transform: translate(${offsetX}px, ${offsetY}px) scale(${scale}) rotate(${rotation || 0}deg); width: ${baseWidth}px; height: ${baseHeight}px; z-index: ${zIndex}; opacity: ${opacity}; left: calc(50% - ${baseWidth / 2}px); top: calc(50% - ${baseHeight / 2}px);`;
@@ -389,6 +478,8 @@
         }
       });
     });
+
+
   </script>
 </body>
 </html>
