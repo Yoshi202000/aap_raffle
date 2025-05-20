@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RaffleController;
 use App\Http\Controllers\PrizeController;
 use App\Http\Controllers\AapRaffleController;
+use App\Http\Controllers\WinnerController;
 
 // Homepage routes
 Route::get('/', function(){
@@ -62,3 +63,6 @@ Route::get('/aap-raffles-carousel', [AapRaffleController::class, 'carouselAll'])
 
 Route::get('/aap-raffles-attendees', [AapRaffleController::class, 'attendeesCarousel'])
     ->name('aap_raffles.attendees');
+
+// show winner coupon, first name, last name 
+Route::get('/winner', [WinnerController::class, 'random']);

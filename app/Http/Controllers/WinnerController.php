@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Winner;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WinnerController extends Controller
 {
@@ -13,6 +14,34 @@ class WinnerController extends Controller
     public function index()
     {
         //
+    }
+
+    /**
+     * Display the random resource of coupon code.
+     */
+
+    public function random()
+    {
+        // Get a random active coupon
+        $randomCoupon = DB::table('aap_scoupon_detail')
+            ->where('ascd_status', 'ACTIVE')
+            ->inRandomOrder()
+            ->first();
+
+        // If no active coupons found
+        if (!$randomCoupon) {
+            return view('winner.show', ['winner' => null]);
+        }
+
+        // Get winner info using the random coupon
+        $winner = DB::table('aap_scoupon_detail as ad')
+            ->join('aap_scoupon_header as ah', 'ah.asc_id', '=', 'ad.asc_id')
+            ->join('members_table as mt', 'ah.members_id', '=', 'mt.members_id')
+            ->select('mt.members_firstname', 'mt.members_lastname', 'ad.ascd_couponcode')
+            ->where('ad.ascd_couponcode', $randomCoupon->ascd_couponcode)
+            ->first();
+
+        return view('winner.show', compact('winner'));
     }
 
     /**
@@ -31,13 +60,7 @@ class WinnerController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Winner $winner)
-    {
-        //
-    }
+   
 
     /**
      * Show the form for editing the specified resource.
