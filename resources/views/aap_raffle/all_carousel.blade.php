@@ -4,13 +4,12 @@
   <meta charset="UTF-8">
   <title>{{ $title }} - Prize Showcase</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="{{ asset('css/aapraffle.css') }}" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.12.0/cdn.js"></script>
-  <style>
-    
-  </style>
+
 </head>
 <body>
-  <div class="container">
+
     @if(count($prizes))
       <div x-data="carousel" class="container">
         <div class="carousel-container">
@@ -23,9 +22,6 @@
                 <template x-if="slide.prize_image">
                   <div class="img-container">
                     <img :src="slide.prize_image" :alt="slide.prize_name">
-                    <div x-show="isDrawing" 
-                         :class="{ 'Namefade-in': isDrawing && !isReturning, 'fade-out': isReturning}"
-                         class="name" x-text="winnerName || 'Name Of The Winner'"></div>
                   </div>
                 </template>
                 <template x-if="!slide.prize_image">
@@ -48,14 +44,16 @@
           <div x-show="isDrawing" 
                :class="{ 'fade-in': isDrawing && !isReturning, 'fade-out': isReturning }" 
                class="title" x-text="drawingTitle"></div>
-          
           <div x-show="isDrawing" 
                :class="{ 'fade-in': isDrawing && !isReturning, 'fade-out': isReturning }" 
                class="digits-container">
-            <template x-for="n in digitCount">
-              <div class="digit" :id="'digit-' + n">-</div>
+            <template x-for="(digit, index) in couponDigits" :key="index">
+              <div class="digit" :id="'digit-' + (index + 1)">-</div>
             </template>
           </div>
+          <div x-show="isDrawing && isDoneDrawing" 
+               :class="{ 'fade-in': isDrawing && isDoneDrawing, 'fade-out': isReturning }"
+               class="name winner-name" x-text="winnerName || 'Name Of The Winner'"></div>
         </div>
         <button class="cta-button" x-show="!isDrawing" @click="startDraw()" x-text="ctaButtonText"></button>
         <div class="product-name" x-text="currentSlide.prize_name"></div>
@@ -66,11 +64,11 @@
         <p>No prizes available for display.</p>
       </div>
     @endif
-    
   </div>
 
   <script>
     window.raffleImages = @json($prizes);
+    window.raffleWinner = @json($winner ?? null);
   
     document.addEventListener('alpine:init', () => {
       Alpine.data('carousel', () => {
@@ -79,31 +77,75 @@
           currentIndex: 0,
           images: [],
           isDrawing: false,
+          isDoneDrawing: false,
           isNext: true,
           isReturning: false, 
           returnedSlides: [],
+          couponCode: '0000000',
+          couponDigits: [],
           
           // Customizable settings
           digitCount: 7,
           drawingTitle: "THE LUCKY WINNER IS",
           ctaButtonText: "START DRAW",
-          backButtonText: "Back to Raffles",
-          winnerName: "",
+          backButtonText: "Back to Raffle",
+          winnerName: "first name and the last name of the winner",
           showPrizeBadge: false,
           rollSoundPath: 'sounds/audio_raffle.mp3',
           finishSoundPath: 'sounds/success.mp3',
           rollSoundVolume: 0.3,
           finishSoundVolume: 0.5,
           
+          // Initialize the component
+          init() {
+            this.images = window.raffleImages || [];
+            
+            // Get winner data from the server
+            const winner = window.raffleWinner || {};
+            this.winnerName = winner.name || "Unknown";
+            if (winner.coupon) {
+              this.couponCode = winner.coupon;
+              this.digitCount = winner.coupon.length;
+              this.couponDigits = Array.from(winner.coupon);
+            } else {
+              this.couponCode = "0000000";
+              this.digitCount = 7;
+              this.couponDigits = Array.from("0000000");
+            }
+
+            this.images = this.images.map(prize => ({
+              ...prize,
+              prize_image: prize.prize_image 
+                ? (prize.prize_image.startsWith('/') ? prize.prize_image : '/' + prize.prize_image)
+                : '/images/no-image.png'
+            }));
+
+            window.addEventListener('keydown', (event) => {
+              if (!this.isDrawing) {
+                if (event.key === 'ArrowRight') {
+                  this.next();
+                } else if (event.key === 'ArrowLeft') {
+                  this.prev();
+                }
+              }
+            });
+          },
+          
           // Methods
           startDraw() {
-            this.isDrawing = true;
-            this.isNext = false;
-            this.animateDigits();
-          },
+              this.isDrawing = true;
+              this.isNext = false;
+              this.isDoneDrawing = false;
 
+              this.$nextTick(() => {
+                console.log("DOM is now ready, starting animation");
+                this.animateDigits();
+              });
+            },
+            
           stopDraw() {
             this.isReturning = true;
+            this.isDoneDrawing = false;
             
             this.returnedSlides = [];
             const total = this.images.length;
@@ -136,16 +178,30 @@
               this.isDrawing = false;
               this.isNext = true;
               this.isReturning = false;
+              this.isDoneDrawing = false;
               this.returnedSlides = [];
             }, 1000);
           },
 
+          afterDraw() {
+            this.isDoneDrawing = true;
+          },
+
           animateDigits() {
             const digits = Array.from({ length: this.digitCount }, (_, i) => 
-              document.getElementById(`digit-${i + 1}`));
+              document.getElementById(`digit-${i + 1}`)
+            );
+            const couponDigits = [...this.couponDigits];
+            console.log("Found digits:", digits.map(d => d?.id));
+            console.log("Coupon digits:", couponDigits);
 
-            let rollSound, finishSound;
+            if (digits.some(d => !d)) {
+              console.warn("Some digit elements were not found in the DOM!");
+              return;
+            }
             
+            let rollSound, finishSound;
+
             try {
               rollSound = new Audio(this.rollSoundPath);     
               finishSound = new Audio(this.finishSoundPath);   
@@ -155,7 +211,6 @@
               console.warn("Sound files could not be loaded:", e);
             }
 
-            // Reset digits
             digits.forEach(digit => {
               if (digit) digit.textContent = '-';
             });
@@ -166,7 +221,7 @@
             digits.forEach((digit, index) => {
               if (!digit) return;
 
-              const randomAnimationTime = 1000 + (index * 300);
+              const randomAnimationTime = 1000 + (index * 1500);
               let animationInterval;
 
               const startAnimation = () => {
@@ -174,7 +229,6 @@
                   digit.textContent = Math.floor(Math.random() * 10);
                   digit.style.animation = 'digitChange 0.1s ease-in-out';
 
-                  // Play roll sound
                   try {
                     if (rollSound) {
                       rollSound.currentTime = 0;
@@ -187,14 +241,12 @@
                   }, 100);
                 }, 100);
 
-                // Stop animation after random duration
                 setTimeout(() => {
                   clearInterval(animationInterval);
-                  digit.textContent = Math.floor(Math.random() * 10);
 
+                  // Use actual digit from the coupon
+                  digit.textContent = couponDigits[index] || '0';
                   finishedCount++;
-
-                  // If all digits are done, play finish sound
                   if (finishedCount === totalDigits) {
                     try {
                       if (rollSound) {
@@ -204,31 +256,16 @@
                       if (finishSound) {
                         finishSound.play().catch(e => console.warn("Could not play sound:", e));
                       }
+                      // Show winner name after digits are complete
+                      setTimeout(() => {
+                        this.afterDraw();
+                      }, 500);
                     } catch (e) {}
                   }
                 }, randomAnimationTime);
               };
 
               setTimeout(startAnimation, index * 300);
-            });
-          },
-
-          init() {
-            this.images = window.raffleImages || [];
-
-            this.images = this.images.map(prize => ({
-              ...prize,
-              prize_image: prize.prize_image 
-                ? (prize.prize_image.startsWith('/') ? prize.prize_image : '/' + prize.prize_image)
-                : '/images/no-image.png'
-            }));
-
-            window.addEventListener('keydown', (event) => {
-              if (event.key === 'ArrowRight') {
-                this.next();
-              } else if (event.key === 'ArrowLeft') {
-                this.prev();
-              }
             });
           },
 

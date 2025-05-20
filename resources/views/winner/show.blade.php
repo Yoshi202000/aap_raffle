@@ -1,10 +1,12 @@
-@if ($winner)
-    <p><strong>First Name:</strong> {{ $winner->members_firstname }}</p>
-    <p><strong>Last Name:</strong> {{ $winner->members_lastname }}</p>
-    <p><strong>Coupon Code:</strong> {{ $winner->ascd_couponcode }}</p>
+@if ($couponCode && $winnerName)
+    <p><strong>Name:</strong> {{ $winnerName }}</p>
+    <p><strong>Coupon Code:</strong> {{ $couponCode }}</p>
+
     <script>
-        const winner = @json($winner);
-        console.log("🎉 Winner Info:", winner);
+        const actualCouponCode = "{{ $couponCode }}";
+        const winnerFullName = "{{ $winnerName }}";
+
+        console.log("🎉 Winner:", winnerFullName, "Coupon:", actualCouponCode);
     </script>
 @else
     <p>No active coupons found.</p>

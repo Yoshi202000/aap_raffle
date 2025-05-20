@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AapRaffle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AapRaffleController extends Controller
 {
@@ -179,27 +180,52 @@ public function updateImage(Request $request, $id)
     return response()->json(['error' => 'No image provided'], 400);
 }
 
-public function carouselAll()
-{
-    $allRaffles = AapRaffle::where('ar_members', 1)->orderBy('ar_order', 'asc')->get();
-    
-    $prizes = [];
-    
-    foreach ($allRaffles as $raffle) {
-        $prizes[] = [
-            'prize_name' => $raffle->ar_nameprize,
-            'prize_image' => $raffle->raffle_image,
-            'prize_count' => $raffle->ar_noprize,
-            'raffle_id' => $raffle->ar_id,
-            'description' => $raffle->ar_nameprizet
-        ];
+ public function carouselAll()
+    {
+        $allRaffles = AapRaffle::where('ar_members', 1)->orderBy('ar_order', 'asc')->get();
+        
+        $prizes = [];
+        
+        foreach ($allRaffles as $raffle) {
+            $prizes[] = [
+                'prize_name' => $raffle->ar_nameprize,
+                'prize_image' => $raffle->raffle_image,
+                'prize_count' => $raffle->ar_noprize,
+                'raffle_id' => $raffle->ar_id,
+                'description' => $raffle->ar_nameprizet
+            ];
+        }
+        
+        // Get a random winner from the database
+        $randomCoupon = DB::table('aap_scoupon_detail')
+            ->where('ascd_status', 'ACTIVE')
+            ->inRandomOrder()
+            ->first();
+            
+        $winner = null;
+        
+        if ($randomCoupon) {
+            $winnerData = DB::table('aap_scoupon_detail as ad')
+                ->join('aap_scoupon_header as ah', 'ah.asc_id', '=', 'ad.asc_id')
+                ->join('members_table as mt', 'ah.members_id', '=', 'mt.members_id')
+                ->select('mt.members_firstname', 'mt.members_lastname', 'ad.ascd_couponcode')
+                ->where('ad.ascd_couponcode', $randomCoupon->ascd_couponcode)
+                ->first();
+                
+            if ($winnerData) {
+                $winner = [
+                    'name' => $winnerData->members_firstname . ' ' . $winnerData->members_lastname,
+                    'coupon' => $winnerData->ascd_couponcode
+                ];
+            }
+        }
+        
+        return view('aap_raffle.all_carousel', [
+            'prizes' => $prizes,
+            'title' => 'All Raffle Prizes',
+            'winner' => $winner
+        ]);
     }
-    
-    return view('aap_raffle.all_carousel', [
-        'prizes' => $prizes,
-        'title' => 'All Raffle Prizes'
-    ]);
-}
 public function attendeesCarousel()
 {
     // Get all raffles that have ar_members == 0, ordered by ar_order

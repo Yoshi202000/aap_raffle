@@ -41,7 +41,10 @@ class WinnerController extends Controller
             ->where('ad.ascd_couponcode', $randomCoupon->ascd_couponcode)
             ->first();
 
-        return view('winner.show', compact('winner'));
+        return view('winner.show', [
+        'couponCode' => $winner->ascd_couponcode,
+        'winnerName' => $winner->members_firstname . ' ' . $winner->members_lastname
+    ]);
     }
 
     /**
