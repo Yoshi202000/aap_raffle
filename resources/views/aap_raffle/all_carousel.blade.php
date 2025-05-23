@@ -16,7 +16,7 @@
           <template x-for="(slide, index) in slides" :key="index">
             <div class="slide" :style="getSlideStyle(slide.position)"> 
               <div :class="{ 
-                'move-up': isDrawing && !isReturning,
+                'move-up': isAnimating && !isReturning,
                 'move-down': isReturning
               }">
                 <template x-if="slide.prize_image">
@@ -55,8 +55,22 @@
                :class="{ 'fade-in': isDrawing && isDoneDrawing, 'fade-out': isReturning }"
                class="name winner-name" x-text="winnerName || 'Name Of The Winner'"></div>
         </div>
-        <button class="cta-button" x-show="!isDrawing" @click="startDraw()" x-text="ctaButtonText"></button>
-        <div class="product-name" x-text="currentSlide.prize_name"></div>
+         
+        
+        <!-- Main CTA Button - shows when not in drawing mode -->
+        <button class="cta-button" x-show="!isDrawing" @click="enterDrawMode()" x-text="ctaButtonText"></button>
+        
+        <!-- START Button - shows when in drawing mode but animation hasn't started -->
+        <button class="cta-button" 
+                x-show="isDrawing && !isAnimating && !isDoneDrawing" 
+                @click="startAnimation()" 
+                x-text="startButtonText"
+                style="cta-button"></button>
+        
+        <div class="product-name" x-text="currentSlide.prize_name"></div> 
+        <div x-show="isDrawing && isDoneDrawing" 
+               :class="{ 'fade-in': isDrawing && isDoneDrawing, 'fade-out': isReturning }"
+               class="branch-name">Branch:</div>
         <button class="back-button" x-show="isDrawing" @click="stopDraw()" x-text="backButtonText"></button>    
       </div>
     @else
@@ -77,31 +91,53 @@
           currentIndex: 0,
           images: [],
           isDrawing: false,
+          isAnimating: false,
           isDoneDrawing: false,
           isNext: true,
           isReturning: false, 
           returnedSlides: [],
           couponCode: '0000000',
           couponDigits: [],
+          isRefreshingWinner: false,
           
           // Customizable settings
           digitCount: 7,
           drawingTitle: "THE LUCKY WINNER IS",
-          ctaButtonText: "START DRAW",
+          ctaButtonText: "SELECT RAFFLE",
+          startButtonText: "START",
           backButtonText: "Back to Raffle",
           winnerName: "first name and the last name of the winner",
           showPrizeBadge: false,
           rollSoundPath: 'sounds/audio_raffle.mp3',
           finishSoundPath: 'sounds/success.mp3',
-          rollSoundVolume: 0.3,
-          finishSoundVolume: 0.5,
+          rollSoundVolume: 1,
+          finishSoundVolume: 1,
           
           // Initialize the component
           init() {
             this.images = window.raffleImages || [];
-            
-            // Get winner data from the server
-            const winner = window.raffleWinner || {};
+            this.setWinnerData(window.raffleWinner || {});
+
+            this.images = this.images.map(prize => ({
+              ...prize,
+              prize_image: prize.prize_image 
+                ? (prize.prize_image.startsWith('/') ? prize.prize_image : '/' + prize.prize_image)
+                : '/images/no-image.png'
+            }));
+
+            window.addEventListener('keydown', (event) => {
+              if (!isDrawing) {
+                if (event.key === 'ArrowRight') {
+                  this.next();
+                } else if (event.key === 'ArrowLeft') {
+                  this.prev();
+                }
+              }
+            });
+          },
+
+          // Set winner data helper method
+          setWinnerData(winner) {
             this.winnerName = winner.name || "Unknown";
             if (winner.coupon) {
               this.couponCode = winner.coupon;
@@ -112,75 +148,31 @@
               this.digitCount = 7;
               this.couponDigits = Array.from("0000000");
             }
+          },
 
-            this.images = this.images.map(prize => ({
-              ...prize,
-              prize_image: prize.prize_image 
-                ? (prize.prize_image.startsWith('/') ? prize.prize_image : '/' + prize.prize_image)
-                : '/images/no-image.png'
-            }));
+          // Enter drawing mode (first step)
+          enterDrawMode() {
+            this.isDrawing = true;
+            this.isNext = false;
+            this.isAnimating = false;
+            this.isDoneDrawing = false;
+          },
 
-            window.addEventListener('keydown', (event) => {
-              if (!this.isDrawing) {
-                if (event.key === 'ArrowRight') {
-                  this.next();
-                } else if (event.key === 'ArrowLeft') {
-                  this.prev();
-                }
-              }
+          // Start the actual animation (second step)
+          startAnimation() {
+            this.isAnimating = true;
+            
+            this.$nextTick(() => {
+              console.log("DOM is now ready, starting animation");
+              console.log("Current winner name:", this.winnerName);
+              console.log("Current coupon digits:", this.couponDigits);
+              this.animateDigits();
             });
           },
-          
-          // Methods
-          startDraw() {
-              this.isDrawing = true;
-              this.isNext = false;
-              this.isDoneDrawing = false;
-
-              this.$nextTick(() => {
-                console.log("DOM is now ready, starting animation");
-                this.animateDigits();
-              });
-            },
             
-          stopDraw() {
-            this.isReturning = true;
-            this.isDoneDrawing = false;
-            
-            this.returnedSlides = [];
-            const total = this.images.length;
-            
-            if (total > 0) {
-              for (let i = 0; i < total; i++) {
-                // Calculate position relative to current index
-                let position;
-                
-                if (i === this.currentIndex) {
-                  position = 0;
-                } else if (i > this.currentIndex) {
-                  const diff = i - this.currentIndex;
-                  position = diff <= Math.floor(total / 2) ? diff : diff - total;
-                } else {
-                  const diff = this.currentIndex - i;
-                  position = diff <= Math.floor(total / 2) ? -diff : total - diff;
-                }
-                
-                this.returnedSlides.push({
-                  ...this.images[i],
-                  position: position,
-                  isCenter: position === 0
-                });
-              }
-            }
-            
-            // Delay state change until animation completes
-            setTimeout(() => {
-              this.isDrawing = false;
-              this.isNext = true;
-              this.isReturning = false;
-              this.isDoneDrawing = false;
-              this.returnedSlides = [];
-            }, 1000);
+         async stopDraw() { 
+           location.reload();
+          return;
           },
 
           afterDraw() {

@@ -141,7 +141,7 @@
       color: var(--primary-color);
       width: 100%;    
       text-align: center;
-      font-size: var(--name-font-size);
+      font-size: 45px;
       font-weight: bold;
       margin-bottom: 30px;
       text-transform: uppercase;
@@ -149,6 +149,20 @@
       top: 580px;
       transform: translateX(-50%);
       z-index: 50;
+    }
+
+    .branch-name{
+      font-size: var(--product-name-font-size);
+      font-weight: 700;
+      color: var(--text-color);
+      text-transform: uppercase;
+      text-align: center;
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 65px; 
+      margin: 0 10px;
+      padding: 10px 0;
     }
 
     .digits-container {

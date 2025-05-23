@@ -66,3 +66,5 @@ Route::get('/aap-raffles-attendees', [AapRaffleController::class, 'attendeesCaro
 
 // show winner coupon, first name, last name 
 Route::get('/winner', [WinnerController::class, 'random']);
+Route::get('/raffle/random-winner', [RaffleController::class, 'randomApi']);
+
