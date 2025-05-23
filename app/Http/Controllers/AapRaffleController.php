@@ -179,7 +179,44 @@ public function updateImage(Request $request, $id)
     
     return response()->json(['error' => 'No image provided'], 400);
 }
-
+public function decreasePrize(Request $request)
+{
+    try {
+        $request->validate([
+            'raffle_id' => 'required|integer|exists:aap_raffle,ar_id'
+        ]);
+        
+        $raffleId = $request->input('raffle_id');
+        
+        // Find the raffle
+        $raffle = AapRaffle::findOrFail($raffleId);
+        
+        // Check if there are prizes left
+        if ($raffle->ar_noprize <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No more prizes available for this raffle'
+            ], 400);
+        }
+        
+        // Decrease the prize count by 1
+        $raffle->ar_noprize = $raffle->ar_noprize - 1;
+        $raffle->save();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Prize count decreased successfully',
+            'new_count' => $raffle->ar_noprize,
+            'raffle_id' => $raffleId
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'An error occurred: ' . $e->getMessage()
+        ], 500);
+    }
+}
  public function carouselAll()
     {
         $allRaffles = AapRaffle::where('ar_members', 1)->orderBy('ar_order', 'asc')->get();

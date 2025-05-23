@@ -5,6 +5,7 @@ use App\Http\Controllers\RaffleController;
 use App\Http\Controllers\PrizeController;
 use App\Http\Controllers\AapRaffleController;
 use App\Http\Controllers\WinnerController;
+use App\Http\Controllers\ImageController;
 
 // Homepage routes
 Route::get('/', function(){
@@ -40,6 +41,7 @@ Route::post('/aap_raffles/update-order', [AapRaffleController::class, 'updateOrd
 Route::get('/aap_raffle/attendees', [AapRaffleController::class, 'createAttendees'])->name('aap_raffles.attendees');
 Route::get('/aap_raffle/members', [AapRaffleController::class, 'createMembers'])->name('aap_raffles.members');
 Route::post('/aap_raffles/update-image/{id}', [AapRaffleController::class, 'updateImage'])->name('aap_raffles.updateImage');
+Route::post('/aap-raffles/decrease-prize', [AapRaffleController::class, 'decreasePrize'])->name('aap_raffles.decrease_prize');
 
 // Get edit modal content - make sure this route is used in your JavaScript
 Route::get('/get-edit-modal-content', function() {
@@ -67,4 +69,9 @@ Route::get('/aap-raffles-attendees', [AapRaffleController::class, 'attendeesCaro
 // show winner coupon, first name, last name 
 Route::get('/winner', [WinnerController::class, 'random']);
 Route::get('/raffle/random-winner', [RaffleController::class, 'randomApi']);
+
+// image bg controller
+Route::post('/upload-image', [ImageController::class, 'upload'])->name('image.upload');
+Route::delete('/delete-image/{filename}', [ImageController::class, 'delete'])->name('image.delete');
+Route::post('/upload-background', [ImageController::class, 'uploadBackground'])->name('background.upload');
 
