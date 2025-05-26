@@ -142,6 +142,7 @@ body {
   transition: opacity 0.5s ease-out;
   padding: 0 10px;
 }
+
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -150,6 +151,7 @@ body {
 .blinking {
   animation: blink 1s step-start infinite;
 }
+
 .name {
   color: var(--primary-color);
   width: 100%;    
@@ -226,7 +228,6 @@ body {
   bottom: 95px; 
   margin: 0 px;
   padding: 10px 0;
-  /* Add these properties to ensure it stays visible */
   min-height: 30px;
   display: flex;
   align-items: center;
@@ -328,31 +329,19 @@ body {
   animation: fadeOutEffect 0.5s ease-out forwards;
 }
 
-.Namefade-in {
-  animation: fadeInEffect 0.5s ease-in forwards;
-}
-
-.move-up-name {
-  animation: moveUpMarginName 0.4s ease-out forwards;
-}
-
-.move-down-name {
-  animation: moveDownMarginName 0.4s ease-out forwards;
-}
-
 .product-name-inside {
   font-size: var(--product-name-font-size);
   font-weight: 7200;
   color: var(--text-color);
   text-transform: uppercase;
   text-align: center;
-  margin-top: 0px; /* Space between image and product name */
+  margin-top: 0px;
   padding: 10px 0;
   min-height: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative; /* Changed from absolute to relative so it follows the container */
+  position: relative;
 }
 
 .move-up {
@@ -393,28 +382,6 @@ body {
   to {
     opacity: 1;
     transform: translate(-50%, 0);
-  }
-}
-
-@keyframes moveUpMarginName {
-  from {
-    transform: translateY(10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-@keyframes moveDownMarginName {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
   }
 }
 
@@ -473,11 +440,90 @@ body {
   100% { opacity: 1; }
 }
 
+/* Enhanced blinking animation for winner name */
+.blinking-winner {
+  animation: blink-winner 1.5s ease-in-out infinite;
+}
 
-@keyframes pulse-name {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
+@keyframes blink-winner {
+  0%, 100% { 
+    opacity: 1; 
+    transform: translateX(-50%) scale(1);
+  }
+  50% { 
+    opacity: 0.3; 
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+/* Upper Left Back Button Styles */
+.back-button-upper-left {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+}
+
+.back-button-upper-left:hover {
+  background-color: var(--text-color);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.back-arrow {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.back-text {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* GitHub banner styles for demo */
+.github {
+  z-index: 10000;
+  bottom: 10px;
+  right: 10px;
+  position: fixed;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0 12px 6px 12px;
+  border: 1px solid #000;
+}
+
+.github a:hover,
+.github a:link,
+.github a:visited,
+.github a:active {
+  color: #000;
+  text-decoration: none;
+}
+
+.github img {
+  height: 30px;
+}
+
+.github #gh-project {
+  font-size: 20px;
+  padding-left: 5px;
+  font-weight: bold;
+  vertical-align: bottom;
 }
 
 /* ===== RESPONSIVE BREAKPOINTS ===== */
@@ -795,151 +841,5 @@ body {
 
   .back-button {
     bottom: 2%;
-  }
-}
-
-
-/* Add this to your CSS to make the winner name blink more prominently */
-
-/* Enhanced blinking animation for winner name */
-.blinking-winner {
-  animation: blink-winner 1.5s ease-in-out infinite;
-}
-
-@keyframes blink-winner {
-  0%, 100% { 
-    opacity: 1; 
-    transform: translateX(-50%) scale(1);
-  }
-  50% { 
-    opacity: 0.3; 
-    transform: translateX(-50%) scale(1.05);
-  }
-}
-
-/* Alternative slower blink option */
-.blinking-winner-slow {
-  animation: blink-winner-slow 2s ease-in-out infinite;
-}
-
-@keyframes blink-winner-slow {
-  0%, 100% { 
-    opacity: 1; 
-  }
-  50% { 
-    opacity: 0.2; 
-  }
-}
-
-/* Alternative pulsing effect option */
-.pulsing-winner {
-  animation: pulse-winner 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse-winner {
-  0%, 100% { 
-    opacity: 1; 
-    transform: translateX(-50%) scale(1);
-  }
-  50% { 
-    opacity: 0.7; 
-    transform: translateX(-50%) scale(1.1);
-  }
-}
-
-
-/* Upper Left Back Button Styles */
-.back-button-upper-left {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background-color: var(--primary-color);
-  color: var(--secondary-color);
-  border: none;
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-}
-
-.back-button-upper-left:hover {
-  background-color: var(--text-color);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
-}
-
-.back-button-upper-left:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.back-arrow {
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 1;
-}
-
-.back-text {
-  font-size: 12px;
-  font-weight: bold;
-}
-
-/* Responsive adjustments for upper left back button */
-@media screen and (max-width: 768px) {
-  .back-button-upper-left {
-    top: 15px;
-    left: 15px;
-    padding: 10px 14px;
-    font-size: 12px;
-  }
-  
-  .back-arrow {
-    font-size: 16px;
-  }
-  
-  .back-text {
-    font-size: 11px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .back-button-upper-left {
-    top: 10px;
-    left: 10px;
-    padding: 8px 12px;
-    font-size: 11px;
-  }
-  
-  .back-arrow {
-    font-size: 14px;
-  }
-  
-  .back-text {
-    font-size: 10px;
-  }
-}
-
-@media screen and (max-width: 360px) {
-  .back-button-upper-left {
-    top: 8px;
-    left: 8px;
-    padding: 6px 10px;
-    gap: 6px;
-  }
-  
-  .back-arrow {
-    font-size: 12px;
-  }
-  
-  .back-text {
-    font-size: 9px;
   }
 }

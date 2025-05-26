@@ -35,11 +35,6 @@ public function randomApi(): JsonResponse
             return response()->json(['winner' => null]);
         }
 
-        // Mark the coupon as INACTIVE
-        DB::table('aap_scoupon_detail')
-            ->where('ascd_couponcode', $randomCoupon->ascd_couponcode)
-            ->update(['ascd_status' => 'INACTIVE']);
-
         // Join tables to get winner info
         $winner = DB::table('aap_scoupon_detail as ad')
             ->join('aap_scoupon_header as ah', 'ah.asc_id', '=', 'ad.asc_id')
@@ -77,11 +72,6 @@ public function randomApi(): JsonResponse
         if (!$randomCoupon) {
             return view('winner.show', ['winner' => null]);
         }
-
-        // Update the status of the selected coupon to INACTIVE
-        DB::table('aap_scoupon_detail')
-            ->where('ascd_couponcode', $randomCoupon->ascd_couponcode)
-            ->update(['ascd_status' => 'INACTIVE']);
 
         // Get winner info using the random coupon
         $winner = DB::table('aap_scoupon_detail as ad')

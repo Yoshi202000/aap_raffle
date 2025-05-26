@@ -7,13 +7,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="{{ asset('css/aapraffle.css') }}" />
   <script defer src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.12.0/cdn.js"></script>
+  <!-- Confetti.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="{{asset ('css/confetti.css') }}"/>
 
+  <style>
+
+  </style>
 </head>
 <body>
 
     @if(count($prizes))
       <div x-data="carousel" class="container">
         <div class="carousel-container">
+          
+          <!-- Upper Left Back Button - shows during drawing mode -->
+          <button class="back-button-upper-left" 
+                  x-show="isStartDrawing" 
+                  @click="stopDraw()" 
+                  title="Go back to carousel">
+            <span class="back-arrow">←</span>
+            <span class="back-text">Back</span>
+          </button>
+          
           <!-- Replace the slide template section in your HTML -->
           <template x-for="(slide, index) in slides" :key="index">
   <div class="slide" 
@@ -31,14 +47,22 @@
       <template x-if="!slide.prize_image">
         <img src="/images/no-image.png" :alt="slide.prize_name">
       </template>
-      <div x-show="!isDrawing || isStartDrawing" 
+      
+      <!-- Move the product name INSIDE the animated container - only show on center slide -->
+      <div 
+        x-show="slide.position === 0"
+        class="product-name-inside"
+        x-text="slide.prize_name">
+      </div>
+      
+      <!-- Prize badge - only show on center slide -->
+      <div x-show="slide.position === 0 && (!isDrawing || isStartDrawing)" 
            class="prize-badge" 
            :class="{ 'sold-out': slide.prize_count <= 0 && !isDrawing && !isStartDrawing }"
            x-text="(isDrawing || isStartDrawing) ? slide.prize_count + ' available' : (slide.prize_count <= 0 ? '0 available' : slide.prize_count + ' available')"></div>
     </div>
   </div>
 </template>
-          
           <div x-show="isNext || isReturning" 
                :class="{ 'fade-in': isReturning }"
                class="navigation">
@@ -59,13 +83,28 @@
               <div class="digit" :id="'digit-' + (index + 1)">-</div>
             </template>
           </div>
-          
-          <div x-show="isDrawing && isDoneDrawing" 
-               :class="{ 'fade-in': isDrawing && isDoneDrawing, 'fade-out': isReturning }"
-               class="name winner-name" x-text="winnerName || 'Name Of The Winner'"></div>
-        </div>
-         
-        
+          <div 
+  x-show="isDrawing && !isDoneDrawing" 
+  :class="{
+    'fade-in': isDrawing && !isDoneDrawing,
+    'fade-out': isReturning,
+    'blinking': isDoneDrawing,
+  }"
+  class="name winner-name blinking-winner"
+  x-text="'The Lucky Winner is'"
+></div>
+
+<!-- Show actual winner name after digits finish -->
+<div 
+  x-show="isDrawing && isDoneDrawing" 
+  :class="{
+    'fade-in': isDrawing && isDoneDrawing,
+    'fade-out': isReturning,
+    'blinking': isDoneDrawing,  
+  }"
+  class="name winner-name blinking-winner" 
+  x-text="winnerName || 'Name Of The Winner'"
+></div>
         <!-- Main CTA Button - shows when not in any drawing state -->
         <button class="cta-button" 
         :class="ctaButtonState.class"
@@ -74,11 +113,6 @@
         @click="enterDrawMode()" 
         x-text="ctaButtonState.text"></button>
 
-        <!-- <div x-show="!isDrawing || isStartDrawing" 
-     class="prize-badge" 
-     :class="{ 'sold-out': currentSlide.prize_count <= 0 }"
-     x-text="currentSlide.prize_count <= 0 ? 'done' : currentSlide.prize_count + ' available'"></div> -->
-        
         <!-- START Button - shows when in start drawing mode only -->
         <button class="cta-button" 
                 x-show="isStartDrawing" 
@@ -86,7 +120,6 @@
                 x-text="startButtonText"></button>
         
         <!-- Show product name when in start drawing mode or normal carousel mode -->
-        <div x-show="!isDrawing || isStartDrawing" class="product-name" x-text="currentSlide.prize_name"></div> 
         <div x-show="isDrawing && isDoneDrawing" 
                :class="{ 'fade-in': isDrawing && isDoneDrawing, 'fade-out': isReturning }"
                class="branch-name">Branch:</div>
@@ -99,6 +132,7 @@
     @endif
   </div>
 
+  <!-- GitHub banner for demo -->
   <script>
     window.raffleImages = @json($prizes);
     window.raffleWinner = @json($winner ?? null);
@@ -110,7 +144,7 @@
           currentIndex: 0,
           images: [],
           isDrawing: false,
-          isStartDrawing: false, // New state added here
+          isStartDrawing: false,
           isAnimating: false,
           isDoneDrawing: false,
           isNext: true,
@@ -119,10 +153,11 @@
           couponCode: '0000000',
           couponDigits: [],
           isRefreshingWinner: false,
+          confettiInterval: null, // Add confetti interval tracking
           
           // Customizable settings
           digitCount: 7,
-          drawingTitle: "THE LUCKY WINNER IS",
+          drawingTitle: "",
           ctaButtonText: "SELECT RAFFLE",
           startButtonText: "START",
           backButtonText: "Back to Raffle",
@@ -146,12 +181,15 @@
             }));
 
             window.addEventListener('keydown', (event) => {
-              if (!isDrawing && !isStartDrawing) {
+              if (!this.isDrawing && !this.isStartDrawing) {
                 if (event.key === 'ArrowRight') {
                   this.next();
                 } else if (event.key === 'ArrowLeft') {
                   this.prev();
                 }
+              }
+              if (event.key === 'Escape' && (this.isDrawing || this.isStartDrawing)) {
+                this.stopDraw();
               }
             });
           },
@@ -170,13 +208,58 @@
             }
           },
 
-          // Enter drawing mode (first step) - now goes to isStartDrawing
+          // Confetti functions
+          randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+          },
+
+          startConfetti() {
+            // Clear any existing confetti
+            this.stopConfetti();
+            
+            const duration = 10 * 1000, // 10 seconds
+              animationEnd = Date.now() + duration,
+              defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
+
+            this.confettiInterval = setInterval(() => {
+              const timeLeft = animationEnd - Date.now();
+              
+              if (timeLeft <= 0) {
+                return this.stopConfetti();
+              }
+
+              const particleCount = 50 * (timeLeft / duration);
+              
+              // Left side confetti burst
+              confetti(
+                Object.assign({}, defaults, {
+                  particleCount,
+                  origin: { x: this.randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+                })
+              );
+              
+              // Right side confetti burst  
+              confetti(
+                Object.assign({}, defaults, {
+                  particleCount,
+                  origin: { x: this.randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+                })
+              );
+            }, 250);
+          },
+
+          stopConfetti() {
+            if (this.confettiInterval) {
+              clearInterval(this.confettiInterval);
+              this.confettiInterval = null;
+            }
+          },
+
+          // Enter drawing mode (first step)
           enterDrawMode() {
-            // Check if current prize has any count left
             if (this.currentSlide.prize_count <= 0) {
-              // Show visual feedback that this prize is not available
               this.showUnavailableMessage();
-              return; // Don't proceed with drawing mode
+              return;
             }
             
             this.isStartDrawing = true;
@@ -187,7 +270,6 @@
           },
 
           showUnavailableMessage() {
-            // Create or update a temporary message element
             const existingMessage = document.querySelector('.unavailable-message');
             if (existingMessage) {
               existingMessage.remove();
@@ -212,7 +294,6 @@
               animation: fadeInOut 3s ease-in-out forwards;
             `;
             
-            // Add animation keyframes if not already added
             if (!document.querySelector('#unavailable-animation')) {
               const style = document.createElement('style');
               style.id = 'unavailable-animation';
@@ -229,7 +310,6 @@
             
             document.body.appendChild(messageDiv);
             
-            // Remove message after animation
             setTimeout(() => {
               if (messageDiv.parentNode) {
                 messageDiv.remove();
@@ -237,12 +317,10 @@
             }, 3000);
           },
 
-          // Add computed property to check if current prize is available
           get isPrizeAvailable() {
             return this.currentSlide.prize_count > 0;
           },
 
-          // Add computed property for button text and state
           get ctaButtonState() {
             if (this.currentSlide.prize_count <= 0) {
               return {
@@ -258,20 +336,16 @@
             };
           },
 
-          // Start the actual animation (second step) - transitions from isStartDrawing to isDrawing
-           async startAnimation() {
-            // Decrease prize count before starting animation
+          async startAnimation() {
             const currentRaffleId = this.currentSlide.raffle_id;
             const currentPrizeCount = this.currentSlide.prize_count;
             
-            // Check if there are prizes left
             if (currentPrizeCount <= 0) {
               alert('No more prizes available for this raffle!');
               return;
             }
             
             try {
-              // Call backend to decrease prize count
               const response = await fetch('/aap-raffles/decrease-prize', {
                 method: 'POST',
                 headers: {
@@ -290,10 +364,8 @@
                 return;
               }
               
-              // Update the local prize count
               this.currentSlide.prize_count = result.new_count;
               
-              // Update the slides array to reflect the change
               const slideIndex = this.images.findIndex(img => img.raffle_id === currentRaffleId);
               if (slideIndex !== -1) {
                 this.images[slideIndex].prize_count = result.new_count;
@@ -305,7 +377,6 @@
               return;
             }
             
-            // Continue with the original animation logic
             this.isStartDrawing = false;
             this.isDrawing = true;
             this.isAnimating = true;
@@ -319,13 +390,19 @@
           },
             
          async stopDraw() { 
+           // Stop confetti when leaving the drawing screen
+           this.stopConfetti();
            location.reload();
-          return;
+           return;
           },
           
          
           afterDraw() {
             this.isDoneDrawing = true;
+            // Start confetti when winner name is shown
+            setTimeout(() => {
+              this.startConfetti();
+            }, 500); // Small delay to let the winner name appear first
           },
 
           animateDigits() {
@@ -385,7 +462,6 @@
                 setTimeout(() => {
                   clearInterval(animationInterval);
 
-                  // Use actual digit from the coupon
                   digit.textContent = couponDigits[index] || '0';
                   finishedCount++;
                   if (finishedCount === totalDigits) {
@@ -397,7 +473,6 @@
                       if (finishSound) {
                         finishSound.play().catch(e => console.warn("Could not play sound:", e));
                       }
-                      // Show winner name after digits are complete
                       setTimeout(() => {
                         this.afterDraw();
                       }, 500);
@@ -419,7 +494,6 @@
               return this.returnedSlides;
             }
             
-            // Show current slide when in either drawing mode or start drawing mode
             if (this.isDrawing || this.isStartDrawing) {
               return [{
                 ...this.currentSlide,
@@ -427,7 +501,6 @@
               }];
             }
           
-            // Normal carousel mode
             const result = [];
             const total = this.images.length;
             
@@ -457,7 +530,6 @@
           },
 
           getSlideStyle(position) {
-            // These values can be customized
             const baseWidth = getComputedStyle(document.documentElement).getPropertyValue('--slide-base-width') || '340px';
             const baseHeight = getComputedStyle(document.documentElement).getPropertyValue('--slide-base-height') || '380px';
             
@@ -485,7 +557,6 @@
 
             const { scale, offsetX, offsetY, zIndex, opacity, rotation } = config[posKey] || fallback;
 
-            // Adjust transition timing for return animation
             const transitionSpeed = getComputedStyle(document.documentElement).getPropertyValue('--transition-speed') || '0.8s';
             const transitionTiming = getComputedStyle(document.documentElement).getPropertyValue('--transition-timing') || 'cubic-bezier(.22,1,.36,1)';
             
@@ -515,5 +586,6 @@
       });
     });
   </script>
+  <script async="" defer="" src="https://buttons.github.io/buttons.js"></script>
 </body>
 </html>
