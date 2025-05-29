@@ -12,9 +12,9 @@
 
                 <div class="card-body">
                     @if (session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
-                        </div>
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
                     @endif
 
                     <div class="row">
@@ -39,77 +39,95 @@
                                             <tbody id="members-tbody" class="sortable-table">
                                                 @php $memberRafflesFound = false; @endphp
                                                 @foreach ($raffles as $raffle)
-                                                    @if($raffle->ar_members == 1)
-                                                        @php $memberRafflesFound = true; @endphp
-                                                        <tr data-id="{{ $raffle->ar_id }}" data-order="{{ $raffle->ar_order }}">
-                                                            <td class="handle text-center" style="cursor: move;">
-                                                                <span class="order-display">{{ $raffle->ar_order }}</span>
-                                                                <i class="fas fa-grip-lines"></i>
-                                                            </td>
-                                                            <td>
-                                                                <div class="editable-field prize-name" data-field="ar_nameprize" data-id="{{ $raffle->ar_id }}">
-                                                                    <span class="editable-text">{{ $raffle->ar_nameprize }}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="editable-fields" data-firld="ar_noprize" data-id="{{ $raffle->ar_id }}">
-                                                                <span class="editable-text">{{ $raffle->ar_noprize }}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="image-upload-container">
-                                                                    @if($raffle->raffle_image)
-                                                                        <img src="{{ asset($raffle->raffle_image) }}" class="img-thumbnail" style="max-height: 50px;">
-                                                                        <button type="button" class="btn btn-sm btn-outline-secondary change-image-btn" data-id="{{ $raffle->ar_id }}">
-                                                                            <i class="fas fa-sync-alt"></i>
-                                                                        </button>
-                                                                    @else
-                                                                        <button type="button" class="btn btn-sm btn-outline-primary add-image-btn" data-id="{{ $raffle->ar_id }}">
-                                                                            <i class="fas fa-plus"></i> Add Image
-                                                                        </button>
-                                                                    @endif
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="btn-group" role="group">
-                                                                    <form action="">
-                                                                    <button type="button" class="Edit-button btn btn-primary btn-sm" data-id="{{ $raffle->ar_id }}">
-                                                                        <i class="fas fa-edit"></i> Edit
-                                                                    </button>
-                                                                    </form>
-                                                                    <form action="{{ route('aap_raffles.destroy', $raffle->ar_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this raffle?');" style="display: inline-block;">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button type="submit" class="delete-button">
-                                                                            Delete
-                                                                        </button>
-                                                                    </form>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
+                                                @if($raffle->ar_members == 1)
+                                                @php $memberRafflesFound = true; @endphp
+                                                <tr data-id="{{ $raffle->ar_id }}" data-order="{{ $raffle->ar_order }}">
+                                                    <td class="handle text-center" style="cursor: move;">
+                                                        <span class="order-display">{{ $raffle->ar_order }}</span>
+                                                        <i class="fas fa-grip-lines"></i>
+                                                    </td>
+                                                    <td>
+                                                        <div class="editable-field prize-name" data-field="ar_nameprize"
+                                                            data-id="{{ $raffle->ar_id }}">
+                                                            <span
+                                                                class="editable-text">{{ $raffle->ar_nameprize }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="editable-fields" data-firld="ar_noprize"
+                                                            data-id="{{ $raffle->ar_id }}">
+                                                            <span class="editable-text">{{ $raffle->ar_noprize }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="image-upload-container">
+                                                            @if($raffle->raffle_image)
+                                                            <img src="{{ asset($raffle->raffle_image) }}"
+                                                                class="img-thumbnail" style="max-height: 50px;">
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-secondary change-image-btn"
+                                                                data-id="{{ $raffle->ar_id }}">
+                                                                <i class="fas fa-sync-alt"></i>
+                                                            </button>
+                                                            @else
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-primary add-image-btn"
+                                                                data-id="{{ $raffle->ar_id }}">
+                                                                <i class="fas fa-plus"></i> Add Image
+                                                            </button>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <form action="">
+                                                                <button type="button"
+                                                                    class="Edit-button btn btn-primary btn-sm"
+                                                                    data-id="{{ $raffle->ar_id }}">
+                                                                    <i class="fas fa-edit"></i> Edit
+                                                                </button>
+                                                            </form>
+                                                            <form
+                                                                action="{{ route('aap_raffles.destroy', $raffle->ar_id) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Are you sure you want to delete this raffle?');"
+                                                                style="display: inline-block;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="delete-button">
+                                                                    Delete
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                @endif
                                                 @endforeach
-                                                
+
                                                 @if(!$memberRafflesFound)
-                                                    <tr class="no-sort">
-                                                        <td colspan="6" class="text-center">No member raffles found</td>
-                                                    </tr>
+                                                <tr class="no-sort">
+                                                    <td colspan="6" class="text-center">No member raffles found</td>
+                                                </tr>
                                                 @endif
                                             </tbody>
                                         </table>
-                                        
+
                                         @if($memberRafflesFound)
-                                            <button type="button" class="btn btn-success save-order-btn" data-type="members" onclick="saveOrder('members')">
-                                                <i class="fas fa-save"></i> Save Members Order
-                                            </button>
+                                        <button type="button" class="btn btn-success save-order-btn" data-type="members"
+                                            onclick="saveOrder('members')">
+                                            <i class="fas fa-save"></i> Save Members Order
+                                        </button>
                                         @endif
                                         @include('aap_raffle.members_modal')
-                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#attendeesRaffleModal" onclick="setNextOrderNumber('members-tbody')">
-                                        Create Members Raffle
-                                    </button>
+                                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#attendeesRaffleModal"
+                                            onclick="setNextOrderNumber('members-tbody')">
+                                            Create Members Raffle
+                                        </button>
                                     </div>
                                     <div class="text-center mb-4">
-                                        <a href="{{ route('aap_raffles.carousel_all') }}" class="btn btn-primary">Start Rolling Raffle</a>
+                                        <a href="{{ route('aap_raffles.carousel_all') }}" class="btn btn-primary">Start
+                                            Rolling Raffle</a>
                                     </div>
                                 </div>
                             </div>
@@ -136,80 +154,98 @@
                                             <tbody id="attendees-tbody" class="sortable-table">
                                                 @php $attendeeRafflesFound = false; @endphp
                                                 @foreach ($raffles as $raffle)
-                                                    @if($raffle->ar_members == 0)
-                                                        @php $attendeeRafflesFound = true; @endphp
-                                                        <tr data-id="{{ $raffle->ar_id }}" data-order="{{ $raffle->ar_order }}">
-                                                            <td class="handle text-center" style="cursor: move;">
-                                                                <span class="order-display">{{ $raffle->ar_order }}</span>
-                                                                <i class="fas fa-grip-lines"></i>
-                                                            </td>
-                                                            <td>
-                                                                <div class="editable-field prize-name" data-field="ar_nameprize" data-id="{{ $raffle->ar_id }}">
-                                                                    <span class="editable-text">{{ $raffle->ar_nameprize }}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="editable-fields" data-firld="ar_noprize" data-id="{{ $raffle->ar_id }}">
-                                                                <span class="editable-text">{{ $raffle->ar_noprize }}</span>
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="image-upload-container">
-                                                                    @if($raffle->raffle_image)
-                                                                        <img src="{{ asset($raffle->raffle_image) }}" class="img-thumbnail" style="max-height: 50px;">
-                                                                        <button type="button" class="btn btn-sm btn-outline-secondary change-image-btn" data-id="{{ $raffle->ar_id }}">
-                                                                            <i class="fas fa-sync-alt"></i>
-                                                                        </button>
-                                                                    @else
-                                                                        <button type="button" class="btn btn-sm btn-outline-primary add-image-btn" data-id="{{ $raffle->ar_id }}">
-                                                                            <i class="fas fa-plus"></i> Add Image
-                                                                        </button>
-                                                                    @endif
-                                                                </div>
-                                                            </td>
-                                                            <td>
-                                                                <div class="btn-group" role="group">
-                                                                    <form action="" class="display: inline-block;">
-                                                                    <button type="button" class="Edit-button btn btn-primary btn-sm" data-id="{{ $raffle->ar_id }}">
-                                                                        <i class="fas fa-edit"></i> Edit
-                                                                    </button>
-                                                                    </form>
-                                                                    <form action="{{ route('aap_raffles.destroy', $raffle->ar_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this raffle?');" style="display: inline-block;">
-                                                                        @csrf
-                                                                        @method('DELETE')
-                                                                        <button type="submit" class="delete-button">
-                                                                            Delete
-                                                                        </button>
-                                                                    </form>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endif
+                                                @if($raffle->ar_members == 0)
+                                                @php $attendeeRafflesFound = true; @endphp
+                                                <tr data-id="{{ $raffle->ar_id }}" data-order="{{ $raffle->ar_order }}">
+                                                    <td class="handle text-center" style="cursor: move;">
+                                                        <span class="order-display">{{ $raffle->ar_order }}</span>
+                                                        <i class="fas fa-grip-lines"></i>
+                                                    </td>
+                                                    <td>
+                                                        <div class="editable-field prize-name" data-field="ar_nameprize"
+                                                            data-id="{{ $raffle->ar_id }}">
+                                                            <span
+                                                                class="editable-text">{{ $raffle->ar_nameprize }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="editable-fields" data-firld="ar_noprize"
+                                                            data-id="{{ $raffle->ar_id }}">
+                                                            <span class="editable-text">{{ $raffle->ar_noprize }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="image-upload-container">
+                                                            @if($raffle->raffle_image)
+                                                            <img src="{{ asset($raffle->raffle_image) }}"
+                                                                class="img-thumbnail" style="max-height: 50px;">
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-secondary change-image-btn"
+                                                                data-id="{{ $raffle->ar_id }}">
+                                                                <i class="fas fa-sync-alt"></i>
+                                                            </button>
+                                                            @else
+                                                            <button type="button"
+                                                                class="btn btn-sm btn-outline-primary add-image-btn"
+                                                                data-id="{{ $raffle->ar_id }}">
+                                                                <i class="fas fa-plus"></i> Add Image
+                                                            </button>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group" role="group">
+                                                            <form action="" class="display: inline-block;">
+                                                                <button type="button"
+                                                                    class="Edit-button btn btn-primary btn-sm"
+                                                                    data-id="{{ $raffle->ar_id }}">
+                                                                    <i class="fas fa-edit"></i> Edit
+                                                                </button>
+                                                            </form>
+                                                            <form
+                                                                action="{{ route('aap_raffles.destroy', $raffle->ar_id) }}"
+                                                                method="POST"
+                                                                onsubmit="return confirm('Are you sure you want to delete this raffle?');"
+                                                                style="display: inline-block;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="delete-button">
+                                                                    Delete
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                @endif
                                                 @endforeach
-                                                
+
                                                 @if(!$attendeeRafflesFound)
-                                                    <tr class="no-sort">
-                                                        <td colspan="6" class="text-center">No attendee raffles found</td>
-                                                    </tr>
+                                                <tr class="no-sort">
+                                                    <td colspan="6" class="text-center">No attendee raffles found</td>
+                                                </tr>
                                                 @endif
                                             </tbody>
                                         </table>
-                                        
+
                                         @if($attendeeRafflesFound)
-                                            <button type="button" class="btn btn-success save-order-btn" data-type="attendees">
-                                                <i class="fas fa-save"></i> Save Attendees Order
-                                            </button>
+                                        <button type="button" class="btn btn-success save-order-btn"
+                                            data-type="attendees">
+                                            <i class="fas fa-save"></i> Save Attendees Order
+                                        </button>
                                         @endif
                                         @include('aap_raffle.attendees_modal')
-                                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#attendeesRaffleModal" onclick="setNextOrderNumber('attendees-tbody')">
+                                        <button type="button" class="btn btn-success" data-bs-toggle="modal"
+                                            data-bs-target="#attendeesRaffleModal"
+                                            onclick="setNextOrderNumber('attendees-tbody')">
                                             Add Attendees Raffle
                                         </button>
                                     </div>
                                 </div>
-                                
-                                    <div class="text-center mb-4">
-                                        <a href="{{ route('aap_raffles.attendees') }}" class="btn btn-info">Attendee Prizes</a>
-                                    </div>
+
+                                <div class="text-center mb-4">
+                                    <a href="{{ route('aap_raffles.attendees') }}" class="btn btn-info">Attendee
+                                        Prizes</a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -219,48 +255,49 @@
     </div>
 </div>
 <!-- Edit Raffle Modal -->
-<div class="modal fade" id="editRaffleModal" tabindex="-1" role="dialog" aria-labelledby="editRaffleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editRaffleModalLabel">Edit Raffle</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="editRaffleForm" method="POST" enctype="multipart/form-data">
-          @csrf
-          @method('PUT')
-          <input type="hidden" class="form-control" id="ar_order" name="ar_order">
-          <input type="hidden" class="form-control" id="ar_date" name="ar_date">
+<div class="modal fade" id="editRaffleModal" tabindex="-1" role="dialog" aria-labelledby="editRaffleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRaffleModalLabel">Edit Raffle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editRaffleForm" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" class="form-control" id="ar_order" name="ar_order">
+                    <input type="hidden" class="form-control" id="ar_date" name="ar_date">
 
-          <div class="form-group">
-            <label for="ar_nameprize">Prize Name</label>
-            <input type="text" class="form-control" id="ar_nameprize" name="ar_nameprize" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="ar_noprize">Number of Prizes</label>
-            <input type="number" class="form-control" id="ar_noprize" name="ar_noprize" required>
-          </div>
-          
-          <!-- Add hidden fields for other required inputs with default values -->
-          <input type="hidden" name="ar_members" value="1">
-          
-          <div class="form-group">
-            <label for="raffle_image">Image</label>
-            <input type="file" class="form-control-file" id="raffle_image" name="raffle_image">
-            <img id="current_image" class="img-thumbnail mt-2" style="max-height: 100px; display: none;">
-          </div>
-          
-          <div class="form-group">
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-          </div>
-        </form>
-      </div>
+                    <div class="form-group">
+                        <label for="ar_nameprize">Prize Name</label>
+                        <input type="text" class="form-control" id="ar_nameprize" name="ar_nameprize" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ar_noprize">Number of Prizes</label>
+                        <input type="number" class="form-control" id="ar_noprize" name="ar_noprize" required>
+                    </div>
+
+                    <!-- Add hidden fields for other required inputs with default values -->
+                    <input type="hidden" name="ar_members" value="1">
+
+                    <div class="form-group">
+                        <label for="raffle_image">Image</label>
+                        <input type="file" class="form-control-file" id="raffle_image" name="raffle_image">
+                        <img id="current_image" class="img-thumbnail mt-2" style="max-height: 100px; display: none;">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <form action="{{ route('background.upload') }}" method="POST" enctype="multipart/form-data">
     @csrf
@@ -284,67 +321,77 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
 
 <style>
-    .editable-field {
-        display: flex;
-        align-items: center;
-    }
-    .editable-field .edit-btn {
-        visibility: hidden;
-        margin-left: 5px;
-    }
-    .editable-field:hover .edit-btn {
-        visibility: visible;
-    }
-    .image-upload-container {
-        display: flex;
-        align-items: center;
-    }
-    .image-upload-container img {
-        margin-right: 5px;
-    }
-    .image-upload-container .change-image-btn {
-        visibility: hidden;
-    }
-    .image-upload-container:hover .change-image-btn {
-        visibility: visible;
-    }
-    .delete-button{
-        background-color: red;
-        border-radius: 5px;
-        border: none;
-        color: white;
-        padding: 5px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 3px;
-    }
-    .edit-button{
-        background-color: green;
-        border-radius: 5px;
-        border: none;
-        color: white;
-        padding: 5px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-        font-size: 16px;
-        margin: 3px;
-    }
-    .custom-card-header{
-        display: flex;                    
-    justify-content: space-between;   
-    align-items: center;              
-    padding: 0.75rem 1.25rem;       
-    background-color: #f8f9fa;        
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125); 
+.editable-field {
+    display: flex;
+    align-items: center;
+}
+
+.editable-field .edit-btn {
+    visibility: hidden;
+    margin-left: 5px;
+}
+
+.editable-field:hover .edit-btn {
+    visibility: visible;
+}
+
+.image-upload-container {
+    display: flex;
+    align-items: center;
+}
+
+.image-upload-container img {
+    margin-right: 5px;
+}
+
+.image-upload-container .change-image-btn {
+    visibility: hidden;
+}
+
+.image-upload-container:hover .change-image-btn {
+    visibility: visible;
+}
+
+.delete-button {
+    background-color: red;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 3px;
+}
+
+.edit-button {
+    background-color: green;
+    border-radius: 5px;
+    border: none;
+    color: white;
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 3px;
+}
+
+.custom-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1.25rem;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
-    }
-    .container{
-        width: 100%;
-    }
+}
+
+.container {
+    width: 100%;
+}
 </style>
 
 <script>
@@ -355,7 +402,8 @@ $(document).on('click', '.Edit-button', function() {
     // Fetch data from table row
     const row = $(this).closest('tr');
     const prizeName = row.find('.prize-name .editable-text').text().trim();
-    const prizeNo = row.find('[data-firld="ar_noprize"] .editable-text').text().trim(); // Note: fixing this typo in HTML would be better
+    const prizeNo = row.find('[data-firld="ar_noprize"] .editable-text').text()
+.trim(); // Note: fixing this typo in HTML would be better
     const order = row.data('order');
     const imageSrc = row.find('img').attr('src') || '';
 
@@ -363,7 +411,7 @@ $(document).on('click', '.Edit-button', function() {
     $('#ar_nameprize').val(prizeName);
     $('#ar_noprize').val(prizeNo);
     $('#ar_order').val(order);
-    
+
     // Set image if it exists
     if (imageSrc) {
         $('#current_image').attr('src', imageSrc).show();
@@ -381,11 +429,11 @@ $(document).on('click', '.Edit-button', function() {
 // Form submission handler
 $('#editRaffleForm').on('submit', function(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(this);
     const raffleId = $('#editRaffleForm').attr('action').split('/').pop();
-    
-    
+
+
     $.ajax({
         url: $(this).attr('action'),
         type: 'POST', // Will be converted to PUT by the @method('PUT') in your form
@@ -402,7 +450,7 @@ $('#editRaffleForm').on('submit', function(e) {
         error: function(xhr) {
             console.error('Error updating raffle:', xhr.responseText);
             let errorMessage = 'Error updating raffle.';
-            
+
             // Try to parse error messages from Laravel validation
             try {
                 const errors = JSON.parse(xhr.responseText);
@@ -414,7 +462,7 @@ $('#editRaffleForm').on('submit', function(e) {
             } catch (e) {
                 // If parsing fails, use generic message
             }
-            
+
             alert(errorMessage);
         }
     });
@@ -423,10 +471,10 @@ $('#editRaffleForm').on('submit', function(e) {
 // Add form submission handler to ensure proper submission
 $('#editRaffleForm').on('submit', function(e) {
     e.preventDefault();
-    
+
     const formData = new FormData(this);
     const raffleId = $('#raffle_id').val();
-    
+
     $.ajax({
         url: $(this).attr('action'),
         type: 'POST',
@@ -471,16 +519,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize sortable tables
     initializeSortableTables();
-    
+
     // Initialize order numbers on page load - STARTING FROM 1
     initializeOrderNumbers();
-    
+
     // Set up inline editing
     setupInlineEditing();
-    
+
     // Set up image upload functionality
     setupImageUpload();
-    
+
     // Set up save order button handlers
     setupSaveOrderButtons();
 });
@@ -544,7 +592,7 @@ function setupSaveOrderButtons() {
 // Save order function
 function saveOrder(type) {
     let orders = [];
-    
+
     // Collect the order information from the table
     $(`#${type}-tbody tr:not(.no-sort)`).each(function(index) {
         const id = $(this).data('id');
@@ -555,7 +603,7 @@ function saveOrder(type) {
             });
         }
     });
-    
+
     // Send the order data to the server
     $.ajax({
         url: '/aap_raffles/update-order', // Using direct URL instead of route()
@@ -603,12 +651,12 @@ function setupInlineEditing() {
             const fieldName = editableField.getAttribute('data-field');
             const raffleId = editableField.getAttribute('data-id');
             const currentValue = editableField.querySelector('.editable-text').textContent.trim();
-            
+
             // Set values in the modal
             document.getElementById('edit-field-name').value = fieldName;
             document.getElementById('edit-raffle-id').value = raffleId;
             document.getElementById('edit-field-value').value = currentValue;
-            
+
             // Set modal title based on field
             let modalTitle = 'Edit Field';
             if (fieldName === 'ar_nameprize') {
@@ -620,23 +668,23 @@ function setupInlineEditing() {
                 document.getElementById('edit-field-value').min = '0';
             }
             document.getElementById('editModalLabel').textContent = modalTitle;
-            
+
             // Show the modal
             $('#inline-edit-modal').modal('show');
         });
     });
-    
+
     // Save edit button click handler
     document.getElementById('save-edit-btn').addEventListener('click', function() {
         const fieldName = document.getElementById('edit-field-name').value;
         const raffleId = document.getElementById('edit-field-id').value;
         let fieldValue = document.getElementById('edit-field-value').value;
-        
+
         // Validate value
         if (fieldName === 'ar_noattendees') {
             fieldValue = parseInt(fieldValue) || 0;
         }
-        
+
         // Send AJAX request to update the field
         $.ajax({
             url: `/aap_raffles/update-field/${raffleId}`,
@@ -647,14 +695,15 @@ function setupInlineEditing() {
             },
             success: function(response) {
                 // Update the display value
-                const editableField = document.querySelector(`.editable-field[data-field="${fieldName}"][data-id="${raffleId}"]`);
+                const editableField = document.querySelector(
+                    `.editable-field[data-field="${fieldName}"][data-id="${raffleId}"]`);
                 if (editableField) {
                     editableField.querySelector('.editable-text').textContent = fieldValue;
                 }
-                
+
                 // Hide the modal
                 $('#inline-edit-modal').modal('hide');
-                
+
                 // Show success message
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-success';
@@ -664,7 +713,7 @@ function setupInlineEditing() {
                 alertDiv.style.right = '20px';
                 alertDiv.style.zIndex = '9999';
                 document.body.appendChild(alertDiv);
-                
+
                 // Remove alert after 3 seconds
                 setTimeout(() => {
                     alertDiv.remove();
@@ -672,7 +721,7 @@ function setupInlineEditing() {
             },
             error: function(error) {
                 console.error('Error updating field:', error);
-                
+
                 // Show error message
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-danger';
@@ -682,7 +731,7 @@ function setupInlineEditing() {
                 alertDiv.style.right = '20px';
                 alertDiv.style.zIndex = '9999';
                 document.body.appendChild(alertDiv);
-                
+
                 // Remove alert after 3 seconds
                 setTimeout(() => {
                     alertDiv.remove();
@@ -702,23 +751,25 @@ function setupImageUpload() {
             document.getElementById('image-upload-input').click();
         });
     });
-    
+
     // File input change handler
     document.getElementById('image-upload-input').addEventListener('change', function() {
         if (this.files.length === 0) return;
-        
+
         const raffleId = this.getAttribute('data-raffle-id');
         const file = this.files[0];
-        
+
         // Create FormData
         const formData = new FormData();
         formData.append('raffle_image', file);
-        
+
         // Show loading indicator
-        const imageContainer = document.querySelector(`.image-upload-container button[data-id="${raffleId}"]`).parentElement;
+        const imageContainer = document.querySelector(`.image-upload-container button[data-id="${raffleId}"]`)
+            .parentElement;
         const originalContent = imageContainer.innerHTML;
-        imageContainer.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Uploading...</div>';
-        
+        imageContainer.innerHTML =
+            '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Uploading...</div>';
+
         // Send AJAX request
         $.ajax({
             url: `/aap_raffles/update-image/${raffleId}`,
@@ -734,13 +785,15 @@ function setupImageUpload() {
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 `;
-                
+
                 // Reattach event listener
-                imageContainer.querySelector('.change-image-btn').addEventListener('click', function() {
-                    document.getElementById('image-upload-input').setAttribute('data-raffle-id', raffleId);
-                    document.getElementById('image-upload-input').click();
-                });
-                
+                imageContainer.querySelector('.change-image-btn').addEventListener('click',
+                    function() {
+                        document.getElementById('image-upload-input').setAttribute(
+                            'data-raffle-id', raffleId);
+                        document.getElementById('image-upload-input').click();
+                    });
+
                 // Show success message
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-success';
@@ -750,7 +803,7 @@ function setupImageUpload() {
                 alertDiv.style.right = '20px';
                 alertDiv.style.zIndex = '9999';
                 document.body.appendChild(alertDiv);
-                
+
                 // Remove alert after 3 seconds
                 setTimeout(() => {
                     alertDiv.remove();
@@ -758,16 +811,19 @@ function setupImageUpload() {
             },
             error: function(error) {
                 console.error('Error uploading image:', error);
-                
+
                 // Restore original content
                 imageContainer.innerHTML = originalContent;
-                
+
                 // Reattach event listener
-                imageContainer.querySelector('.add-image-btn, .change-image-btn').addEventListener('click', function() {
-                    document.getElementById('image-upload-input').setAttribute('data-raffle-id', raffleId);
-                    document.getElementById('image-upload-input').click();
-                });
-                
+                imageContainer.querySelector('.add-image-btn, .change-image-btn').addEventListener(
+                    'click',
+                    function() {
+                        document.getElementById('image-upload-input').setAttribute(
+                            'data-raffle-id', raffleId);
+                        document.getElementById('image-upload-input').click();
+                    });
+
                 // Show error message
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'alert alert-danger';
@@ -777,7 +833,7 @@ function setupImageUpload() {
                 alertDiv.style.right = '20px';
                 alertDiv.style.zIndex = '9999';
                 document.body.appendChild(alertDiv);
-                
+
                 // Remove alert after 3 seconds
                 setTimeout(() => {
                     alertDiv.remove();
@@ -786,5 +842,4 @@ function setupImageUpload() {
         });
     });
 }
-
 </script>

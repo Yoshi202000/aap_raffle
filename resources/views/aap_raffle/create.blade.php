@@ -1,34 +1,36 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Create AAP Raffle Entry</title>
     <script>
-        function setParticipant(type) {
-            if (type === 'members') {
-                document.getElementById('ar_members').value = 1;
-                document.getElementById('ar_attendees').value = 0;
-            } else {
-                document.getElementById('ar_members').value = 0;
-                document.getElementById('ar_attendees').value = 1;
-            }
+    function setParticipant(type) {
+        if (type === 'members') {
+            document.getElementById('ar_members').value = 1;
+            document.getElementById('ar_attendees').value = 0;
+        } else {
+            document.getElementById('ar_members').value = 0;
+            document.getElementById('ar_attendees').value = 1;
         }
+    }
     </script>
 </head>
+
 <body>
     <h1>Create AAP Raffle Entry</h1>
 
     @if (session('success'))
-        <p style="color: green">{{ session('success') }}</p>
+    <p style="color: green">{{ session('success') }}</p>
     @endif
 
     @if ($errors->any())
-        <div style="color: red;">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    <div style="color: red;">
+        <ul>
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
 
     <form action="{{ route('aap_raffles.store') }}" method="POST" enctype="multipart/form-data">
@@ -41,8 +43,10 @@
         <input type="number" name="ar_cat"><br><br>
 
         <label>Participants:</label><br>
-        <input type="radio" name="participant_type" value="members" onclick="setParticipant('members')" checked> Members<br>
-        <input type="radio" name="participant_type" value="attendees" onclick="setParticipant('attendees')"> Attendees<br><br>
+        <input type="radio" name="participant_type" value="members" onclick="setParticipant('members')" checked>
+        Members<br>
+        <input type="radio" name="participant_type" value="attendees" onclick="setParticipant('attendees')">
+        Attendees<br><br>
 
         <input type="hidden" id="ar_members" name="ar_members" value="1">
         <input type="hidden" id="ar_attendees" name="ar_attendees" value="0">
@@ -58,7 +62,7 @@
 
         <label>Number of Attendees (ar_noattendees):</label>
         <input type="number" name="ar_noattendees" required><br><br>
- 
+
         <label>Date (ar_date):</label>
         <input type="date" name="ar_date" required><br><br>
 
@@ -71,4 +75,5 @@
         <button type="submit">Submit Raffle</button>
     </form>
 </body>
+
 </html>

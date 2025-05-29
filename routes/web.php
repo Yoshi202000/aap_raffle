@@ -8,30 +8,7 @@ use App\Http\Controllers\WinnerController;
 use App\Http\Controllers\ImageController;
 
 // Homepage routes
-Route::get('/', function(){
-    return view('aap_raffle.index');
-});
-
-// Raffle routes
-Route::get('/raffles/index', function (){
-    return view('index');
-});
-Route::get('/raffles/create', function () {
-    return view('raffles.create');
-});
-Route::get('/raffles', [RaffleController::class, 'index']);
-Route::get('/raffles/create', [RaffleController::class, 'create']);
-Route::post('/raffles', [RaffleController::class, 'store']);
-Route::get('/raffles/{raffle_id}', [RaffleController::class, 'show']);
-Route::get('/raffles/{raffle_id}/edit', [RaffleController::class, 'edit']);
-Route::put('/raffles/{raffle_id}', [RaffleController::class, 'update']);
-Route::delete('/raffles/{raffle_id}', [RaffleController::class, 'destroy']);
-
-// Prize routes
-Route::resource('prizes', PrizeController::class)->except(['index', 'create', 'show']);
-Route::post('/prizes', [PrizeController::class, 'store']);
-Route::get('/raffles/{raffle_id}/prizes', [PrizeController::class, 'showByRaffle'])->name('prizes.show');
-Route::post('/prizes-debug', [PrizeController::class, 'debug'])->name('prizes.debug');
+Route::redirect('/', '/aap_raffles');
 
 // AAP Raffle routes - using resource for standard CRUD
 Route::resource('aap_raffles', AapRaffleController::class);

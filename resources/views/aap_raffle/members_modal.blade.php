@@ -1,7 +1,8 @@
 <!-- resources/views/aap_raffle/attendees_modal.blade.php -->
 
 <!-- Attendees Raffle Modal -->
-<div class="modal fade" id="attendeesRaffleModal" tabindex="-1" aria-labelledby="attendeesRaffleModalLabel" aria-hidden="true">
+<div class="modal fade" id="attendeesRaffleModal" tabindex="-1" aria-labelledby="attendeesRaffleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <form method="POST" action="{{ route('aap_raffles.store') }}" enctype="multipart/form-data">
@@ -12,7 +13,7 @@
                     <h5 class="modal-title" id="attendeesRaffleModalLabel">Create M Raffle Entry</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                
+
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="ar_nameprize" class="form-label">Prize Name</label>
@@ -44,7 +45,7 @@
     </div>
 </div>
 <script>
-    // Function to set the next order number in the modal
+// Function to set the next order number in the modal
 function setNextOrderNumber(tableId) {
     const nextOrder = getNextOrderNumber(tableId);
     // Set the value in the modal
